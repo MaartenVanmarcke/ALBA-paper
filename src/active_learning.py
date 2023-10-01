@@ -7,7 +7,7 @@ import numpy as np
 # Active learning with domain preselection
 # -----------------------------------------------------------------------------------------
 
-
+## Choose the instance in a cluster (arm) to be queried -> line 11
 def active_learning(
     domain_keys, train_data, classifier, al_strategy="entropy", single_classifier=False
 ):

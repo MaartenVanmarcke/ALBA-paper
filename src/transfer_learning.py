@@ -11,10 +11,9 @@ from collections import OrderedDict, Counter
 from transfertools.models import CORAL
 from transfertools.models import LocIT
 
-import methods.config as cfg
-from .classifier import Classifier
-from .ReliableMSTL.KernelUtil import kernel_mean_matching, mmd
-
+import config as cfg
+from classifier import Classifier
+from ReliableMSTL.KernelUtil import kernel_mean_matching, mmd
 
 
 def get_transfer_classifier(transfer_function, modus, transfer_settings={}):

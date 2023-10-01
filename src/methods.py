@@ -5,10 +5,10 @@ from collections import OrderedDict
 from sklearn.cluster import DBSCAN, KMeans
 from sklearn.metrics import pairwise_distances
 
-from .active_learning import active_learning
-from .bandit import MAB, DomainArm
-from .classifier import Classifier
-from .transfer_learning import get_transfer_classifier
+from active_learning import active_learning
+from bandit import MAB, DomainArm
+from classifier import Classifier
+from transfer_learning import get_transfer_classifier
 
 
 # -----------------------------------------------------------------------------------------
@@ -79,12 +79,15 @@ class MABMethod:
         self.query_budget = int(query_budget)
         self.verbose = bool(verbose)
 
+    ## The algorithm!!
     def fit_query(self, train_data, return_debug_info=False):
 
+        ## Line 5
         # first iteration: divide the domain in clusters (smart or naive strategy)
         if self.iteration_ == 0:
             self._initialize_armed_bandits(train_data)
 
+        ## Line 6 & 13
         # fit the classifier (transfer / no transfer)
         # this is still a single classifier per domain
         if self.iteration_ == 0:
@@ -94,10 +97,14 @@ class MABMethod:
             self.classifier.apply_transfer(train_data)
         self.classifier.fit_all(train_data, ignore_unchanged=True)
 
+        ## QUESTION: where is the for loop?? 
+        ##      -> do you take the first query in the variable <queries> and then call fit_query again? Until self.query_budget times? 
         # mab strategy
+        ## line 14 & 10: estimate payoffs and thén get order of arms to play
         play_order = self._play_multi_armed_bandit(train_data)
 
         # instance selection within each domain
+        ## line 11
         all_scores = active_learning(
             train_data.keys_, train_data, self.classifier, self.al_strategy
         )
@@ -126,12 +133,14 @@ class MABMethod:
             predictions[key] = self.classifier.predict(key, X, probabilities)
         return predictions
 
+    ## Line 5: clustering the data
     def _initialize_armed_bandits(self, train_data):
 
         # keep track of the armed bandits
         # structure: key = armed bandit ID, value = {domain_key: ..., indices: [...]}
         self.armed_bandits = OrderedDict({})
 
+        ## Each domain is a seperate armed bandit (1 big cluster per domain)
         if self.abstraction_level < 2:
             for ID, key in enumerate(train_data.keys_):
                 n, _ = train_data.get_domain_shape(key)
@@ -141,6 +150,7 @@ class MABMethod:
                 }
             return
 
+        ## Each domain gets divided in clusters, with a specified number of clusters
         # divide each domain in the given number of clusters
         if self.abstraction_strat == "naive":
             ID = 0
@@ -162,6 +172,7 @@ class MABMethod:
                         }
                         ID += 1
 
+        ## Each domain gets divided in clusters, with a variable number of clusters
         # smart division in the number of clusters: DBSCAN
         elif self.abstraction_strat == "smart":
             ID = 0
@@ -200,18 +211,21 @@ class MABMethod:
             nb = len(self.armed_bandits)
 
             # init bandit and arms
+            ## Initialize the MAB algorithm
             self.bandit = MAB(
                 nb,
                 T=self.query_budget,
                 solver=self.mab,
                 solver_param={"alpha": self.mab_alpha, "sigma": self.mab_sigma},
             )
+            ## Initialize the reward function. Initialize all on 0 -> line 8
             self.arms = {
                 ID: DomainArm(metric=self.mabreward)
                 for ID, _ in self.armed_bandits.items()
             }
 
         # update the reward (first time is handled in the arms itself)
+        ## line 14
         all_probs = {}
         all_preds = {}
         for key in train_data.keys_:
@@ -234,6 +248,7 @@ class MABMethod:
                     if last_labeled[1] in cluster["indices"]:
                         self.i = ID
                         break
+            ## Tell from which cluster (arm) you have queried
             self.bandit.play(self.i, self.arms)
 
         # decide order to play the arms (self.i = ID of the selected arm this round)
