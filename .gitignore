@@ -132,3 +132,5 @@ dmypy.json
 .pyre/
 src/img/*.png
 src/video.avi
+*.png
+src/img/iteration002.png
