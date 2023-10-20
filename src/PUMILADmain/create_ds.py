@@ -13,32 +13,35 @@ def gen_data(k, nbags, bag_contfactor = 0.1, seed = 331):
     n_anom_clusters = len(anom_clusters.keys())
     tot_clusters = n_norm_clusters + n_anom_clusters
     
-    bags_labels = np.zeros(nbags, np.int)
+    bags_labels = np.zeros(nbags, int)
     bags = {}
     X_inst = np.empty(shape = (0,2))
     y_inst = np.array([])
     
     for b in range(nbags):
         label = np.random.binomial(1, bag_contfactor, size=1)[0]
-        w = np.zeros(tot_clusters, np.float)
+        w = np.zeros(tot_clusters, float)
         if label == 0:
-            w = np.zeros(n_norm_clusters, np.float)
-            tmp_norm_cls = int(np.round(np.random.uniform(low=0.5/n_norm_clusters,high=1.0,size=1)[0]*n_norm_clusters,0))
-            chosen_normcls = np.random.choice(np.arange(0,n_norm_clusters),tmp_norm_cls,replace=False)
-            w[chosen_normcls] = np.random.uniform(low=0.0, high=1.0, size=tmp_norm_cls)
+            w = np.random.uniform(low=0.0, high=1.0, size=n_norm_clusters)
+            ## To get different distributions, uncomment:
+            #w = np.zeros(n_norm_clusters, float)
+            #tmp_norm_cls = int(np.round(np.random.uniform(low=0.5/n_norm_clusters,high=1.0,size=1)[0]*n_norm_clusters,0))
+            #chosen_normcls = np.random.choice(np.arange(0,n_norm_clusters),tmp_norm_cls,replace=False)
+            #w[chosen_normcls] = np.random.uniform(low=0.0, high=1.0, size=tmp_norm_cls)
             w = w/sum(w)
             w = np.around(w*k).astype(int)
             w[np.random.choice(np.where(w>=sum(w)-k)[0],size=1,replace=False)]+=k-sum(w)
             X,y = gen_normals(norm_clusters, w)
         elif label == 1:
             while sum(w[-n_anom_clusters:]) == 0:
-                w = np.zeros(tot_clusters, np.float)
-                tmp_norm_cls = int(np.round(np.random.uniform(low=0.5/n_norm_clusters,high=1.0,size=1)[0]*n_norm_clusters,0))
-                chosen_normcls = np.random.choice(np.arange(0,n_norm_clusters),tmp_norm_cls,replace=False)
-                tmp_anom_cls = int(np.round(np.random.uniform(low=0.5/n_anom_clusters,high=1.0,size=1)[0]*n_anom_clusters,0))
-                chosen_anomcls = np.random.choice(np.arange(n_norm_clusters,tot_clusters),tmp_anom_cls,replace=False)
-                idx_w = np.concatenate((chosen_normcls, chosen_anomcls))
-                w[idx_w] = np.random.uniform(low=0.0, high=1.0, size=tmp_norm_cls+tmp_anom_cls)
+                w = np.random.uniform(low=0.0, high=1.0, size=tot_clusters)
+                #w = np.zeros(tot_clusters, float)
+                #tmp_norm_cls = int(np.round(np.random.uniform(low=0.5/n_norm_clusters,high=1.0,size=1)[0]*n_norm_clusters,0))
+                #chosen_normcls = np.random.choice(np.arange(0,n_norm_clusters),tmp_norm_cls,replace=False)
+                #tmp_anom_cls = int(np.round(np.random.uniform(low=0.5/n_anom_clusters,high=1.0,size=1)[0]*n_anom_clusters,0))
+                #chosen_anomcls = np.random.choice(np.arange(n_norm_clusters,tot_clusters),tmp_anom_cls,replace=False)
+                #idx_w = np.concatenate((chosen_normcls, chosen_anomcls))
+                #w[idx_w] = np.random.uniform(low=0.0, high=1.0, size=tmp_norm_cls+tmp_anom_cls)
                 w = w/sum(w)
                 w = np.around(w*k).astype(int)
                 w[np.random.choice(np.where(w>=sum(w)-k)[0],1)]+=k-sum(w)
@@ -64,7 +67,7 @@ def gen_normals(norm_clusters, w):
         X2 = np.concatenate((X2,np.random.normal(loc=X2_mean, scale=X2_var, size=w[key-1])))
 
     X = np.array([X1,X2]).reshape(2,-1)
-    y = np.zeros(sum(w), np.int)
+    y = np.zeros(sum(w), int)
     return X,y
 
 def gen_anomalies(norm_clusters, anom_clusters, w):
@@ -84,7 +87,7 @@ def gen_anomalies(norm_clusters, anom_clusters, w):
         X2 = np.concatenate((X2,np.random.normal(loc=X2_mean, scale=X2_var, size=w[key-1])))
     nnormals = sum(w[:-len(anom_clusters.keys())])
     nanom = sum(w[-len(anom_clusters.keys()):])
-    y = np.zeros(nnormals+nanom, np.int)
+    y = np.zeros(nnormals+nanom, int)
     y[-nanom:] = 1
     X = np.array([X1,X2]).reshape(2,-1)
     return X,y

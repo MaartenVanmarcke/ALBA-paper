@@ -4,6 +4,7 @@ from abc import abstractmethod
 
 from scipy.optimize import curve_fit
 from sklearn.metrics.pairwise import cosine_similarity
+from rewardInfo import RewardInfo
 
 
 # -----------------------------------------------------------------------------------------
@@ -14,7 +15,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 class MAB:
     """ Generic MAB class, some methods need overriding. """
 
-    def __init__(self, K, T=100, solver="ucb", solver_param={}):
+    def __init__(self, K, T=100, solver="ucb", solver_param={}, rewardInfo: RewardInfo = None):
 
         # parameters
         self.t = -1
@@ -30,6 +31,9 @@ class MAB:
         # the policy and its reward
         self.policy = np.array([])
         self.policy_payoff = np.array([])
+        if (rewardInfo==None):
+            raise Exception("No rewardInfo object given")
+        self.rewardInfo = rewardInfo
 
     def decide(self, return_estimate=False):
         """ Decide the order in which to play the arms. """
@@ -72,10 +76,13 @@ class MAB:
                     self.t,
                     self.counts,
                     self.rewards,
+                    self.rewardInfo,
                     **self.solver_param
                 )
             else:
                 raise Exception("Invalid solver")
+            
+        self.rewardInfo.updateAllBanditRewards(index)
 
         # decide the order to play the arms
         sorted_index = sorted(index.items(), key=lambda x: x[1], reverse=True)
@@ -103,7 +110,7 @@ class MAB:
 # -----------------------------------------------------------------------------------------
 
 
-def solver_rotten_swa(K, T, t, counts, R, **kwargs):
+def solver_rotten_swa(K, T, t, counts, R, rewardInfo: RewardInfo, **kwargs):
     """
     Based on: https://arxiv.org/abs/1702.07274
     Non-parametric case
@@ -118,13 +125,19 @@ def solver_rotten_swa(K, T, t, counts, R, **kwargs):
         * (np.log(np.sqrt(2) * T) ** (1 / 3))
     )
 
+
     if t < M * K:
         # ramp-up: selection by Round-Robin (i.e., just pick one with smallest count)
+        if (t==0): ## TODO: this makes it slower, change this!
+            rewardInfo.startRoundRobin()
         index = {i: 1.0 / (c + 1.0) for i, c in enumerate(counts)}
 
     else:
         # balanced selection: select the arm that maximizes average payoff over window size M
         # requires access to the reward sequence per arm
+        if (rewardInfo.isInRoundRobin()):  ## TODO: this makes it slower, change this!
+            rewardInfo.setIterationEndRoundRobin(t)
+            rewardInfo.endRoundRobin()
         index = {}
         for i, rs in R.items():
             mu_i = (1 / M) * np.sum(rs[-M:])
@@ -304,7 +317,7 @@ class DomainArm(Arm):
         # update the reward
         if not ((self.prob0 is None) and (self.pred0 is None)):
             if self.metric == "entropy":
-                self.reward = self._reward_entropy(self.prob0, prob1)
+                self.reward = self._reward_entropy(self.prob0, prob1, pred1)
             elif self.metric == "cosine":
                 self.reward = self._reward_cosine(self.pred0, pred1)
             elif self.metric == "flips":
@@ -320,14 +333,18 @@ class DomainArm(Arm):
 
     # reward mechanisms
     # reward = change in metric
-    def _reward_entropy(self, p0, p1):
+    def _reward_entropy(self, p0, p1, pred1):
         # probabilities to entropy (scaled)
         H0 = self._compute_entropy_sum(p0)
         H1 = self._compute_entropy_sum(p1)
         # map to range [0, 1]
         # return ((H0 - H1) + 1.0) / 2.0
         # range [-1, 1]
-        return H0 - H1
+        H = self._compute_entropy_abs(p0, p1)
+        #if (any(pred1==1)):
+        #    H += 0.02 #H/5
+        return H
+        #return H0 - H1
 
     def _reward_cosine(self, p0, p1):
         # predictions
@@ -346,6 +363,24 @@ class DomainArm(Arm):
             if not (p == 0.0 or p == 1.0):
                 H += -(p * np.log(p) + (1.0 - p) * np.log(1.0 - p))
         Z = -len(probs) * (2.0 * 0.5 * np.log(0.5))
+        return H / Z
+    
+    
+
+    def _compute_entropy_abs(self, probs0, probs1):
+        if len(probs0)!=len(probs1):
+            raise Exception
+        H = 0.0
+        for idx in range(len(probs0)):
+            p0 = probs0[idx]
+            p1 = probs1[idx]
+            a=b=0
+            if not (p0 == 0.0 or p0 == 1.0):
+                a = -(p0 * np.log(p0) + (1.0 - p0) * np.log(1.0 - p0))
+            if not (p1 == 0.0 or p1 == 1.0):
+                b = -(p1 * np.log(p1) + (1.0 - p1) * np.log(1.0 - p1))
+            H += abs(a-b)
+        Z = -len(probs0) * (2.0 * 0.5 * np.log(0.5))
         return H / Z
 
     # # REWARD mechanisms (higher = better)

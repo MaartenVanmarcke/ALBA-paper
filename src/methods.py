@@ -9,6 +9,7 @@ from active_learning import active_learning
 from bandit import MAB, DomainArm
 from classifier import Classifier
 from transfer_learning import get_transfer_classifier
+from rewardInfo import RewardInfo
 
 
 # -----------------------------------------------------------------------------------------
@@ -55,6 +56,7 @@ class MABMethod:
         al_strategy="random",
         query_budget=100,
         verbose=False,
+        rewardInfo:RewardInfo=None
     ):
 
         # general
@@ -78,6 +80,7 @@ class MABMethod:
         self.probs0 = None
         self.query_budget = int(query_budget)
         self.verbose = bool(verbose)
+        self.rewardInfo = rewardInfo
 
     ## The algorithm!!
     def fit_query(self, train_data, return_debug_info=False):
@@ -217,6 +220,7 @@ class MABMethod:
                 T=self.query_budget,
                 solver=self.mab,
                 solver_param={"alpha": self.mab_alpha, "sigma": self.mab_sigma},
+                rewardInfo=self.rewardInfo
             )
             ## Initialize the reward function. Initialize all on 0 -> line 8
             self.arms = {
@@ -231,7 +235,7 @@ class MABMethod:
         for key in train_data.keys_:
             X = train_data.get_domain(key)
             probs = self.classifier.predict(key, X, True)
-            all_probs[key] = probs[:, 1].flatten()
+            all_probs[key] = probs.flatten()
             all_preds[key] = self.classifier.predict(key, X, False)
 
         for ID, cluster in self.armed_bandits.items():
@@ -250,6 +254,8 @@ class MABMethod:
                         break
             ## Tell from which cluster (arm) you have queried
             self.bandit.play(self.i, self.arms)
+            if (self.rewardInfo != None):
+                self.rewardInfo.updateReward(self.i, self.arms[self.i].reward)
 
         # decide order to play the arms (self.i = ID of the selected arm this round)
         play_order = self.bandit.decide(return_estimate=False)

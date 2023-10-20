@@ -10,7 +10,8 @@ from sklearn.metrics import pairwise_distances
 from sklearn.ensemble import IsolationForest
 from sklearn.svm import SVC
 from anomatools.models import SSDO
-
+from pyod.models.iforest import IForest
+from IForestWrap import IForestWrap
 
 # -----------------------------------------------------------------------------------------
 # Classifier
@@ -80,31 +81,31 @@ class Classifier:
     def _anomaly_fit(self, X, y=None, w=None):
         if y is None:
             y = np.zeros(len(X), dtype=int)
-        # iforest prior
-        iforest = IsolationForest(n_estimators=200, contamination=self.c_, behaviour='new')
-        iforest.fit(X)
-        prior = iforest.decision_function(X) * -1
-        prior = (prior - min(prior)) / (max(prior) - min(prior))
+        # Isolation Forest prior
+        # TODO: random_state=i
+        prior = IForestWrap(n_estimators=200, contamination=self.c_, random_state = 0)
+        prior.fit(X)
+        #train_prior = prior.decision_scores_
+        #test_prior = prior.decision_function(X)
+        
         # SSDO
-        ssdo = SSDO(k=30, alpha=2.3, unsupervised_prior='other', contamination=self.c_)
-        ssdo.fit(X, y, prior=prior)
-        self.clf = {0: iforest, 1: ssdo}
+        detector = SSDO(base_detector=prior, k=7)  ## TODO: change k
+        detector.fit(X, y)
+        self.clf = {0: prior, 1: detector}
         return self
 
     def _anomaly_predict_proba(self, X):
         # iforest prior
-        prior = self.clf[0].decision_function(X) * -1
-        prior = (prior - min(prior)) / (max(prior) - min(prior))
+        test_prior = self.clf[0].decision_function(X)
         # SSDO: probabilities [0: normal, 1: anomaly]
-        probabilities = self.clf[1].predict_proba(X, method='unify', prior=prior)
+        probabilities = self.clf[1].predict_proba(X)[:,1]
         return probabilities
 
     def _anomaly_predict(self, X):
         # iforest prior
-        prior = self.clf[0].decision_function(X) * -1
-        prior = (prior - min(prior)) / (max(prior) - min(prior))
+        test_prior = self.clf[0].decision_function(X)
         # SSDO: [-1: normal, 1: anomaly]
-        predictions = self.clf[1].predict(X, prior=prior)
+        predictions = self.clf[1].predict(X)
         return predictions
 
 
