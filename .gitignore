@@ -142,3 +142,4 @@ src/colorimg/
 /src/plots/
 src/img/iteration000.png
 src/*.avi
+*.avi
