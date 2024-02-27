@@ -118,7 +118,7 @@ class Visualizer():
         print(epoch)
         plt.title('Aligned 2D Toy Data Set - Epoch '+str(epoch))
         plt.legend()
-        fig.savefig('alignflow-master/img/epoch'+str(epoch)+'.png',bbox_inches='tight')
+        fig.savefig(os.path.join(parser.current, "img", "epoch"+str(epoch)+'.png'),bbox_inches='tight')
         plt.close(fig)
 
 
@@ -339,32 +339,24 @@ def test(args):
 if __name__ == '__main__':
     current = pathlib.Path(__file__).parent.resolve()
     parser = TestArgParser()
-    parser.name = "mmoons"
-    parser.num_sources = 10
-    parser.features = 2
     parser.model = "Flow2Flow"
     parser.crop_shape = (128, 128)
     parser.resize_shape = (144, 144)
     parser.data_dir = os.path.join(current, "data", "testdata")
     parser.gpu_ids = []#[0]#[0,1,2,3]
-    parser.batch_size =1#16
-    parser.iters_per_print= 16 
     parser.iters_per_visual =320 
     parser.norm_type= "instance" 
     parser.num_blocks= 0#4 
     parser.num_channels_g = 1#32 
-    parser.num_epochs =20
     parser.num_scales= 2 
     parser.use_dropout= False 
     parser.use_mixer =True 
-    #parser.lambda_mle =1e-4
     parser.num_channels = 1
     parser.num_channels_d = 1
     parser.initializer = "normal"
     parser.kernel_size_d = 1
     parser.iters_per_visual = 256
-    parser.iters_per_print = 4
-    parser.iters_per_eval = 1000
+    parser.iters_per_eval = 100
     parser.max_ckpts = 5
     parser.metric_name = "MSE_src2tgt"
     parser.maximize_metric = False
@@ -372,13 +364,10 @@ if __name__ == '__main__':
     parser.lambda_tgt = 10.
     parser.lambda_id = 0.5
     parser.lambda_l1 = 100.
-    parser.lambda_mle = 1.
     parser.beta_1 = .5
     parser.beta_2 = .999
-    parser.lr = 2e-4
     parser.rnvp_beta_1 = .5
     parser.rnvp_beta_2 = .999
-    parser.rnvp_lr = 2e-4
     parser.weight_norm_l2 = 5e-5
     parser.lr_policy = "linear"
     parser.lr_step_epochs = 100
@@ -389,17 +378,27 @@ if __name__ == '__main__':
     parser.clamp_jacobian = False
     parser.jc_lambda_min = 1.
     parser.jc_lambda_max = 20.
-    parser.batch_size = 4
     parser.checkpoints_dir = os.path.join(current, "ckpts")
-    parser.direction = "ab"
-    parser.initializer = "normal"
+    parser.ckpt_path = ""
     parser.kernel_size_d = 4
     parser.norm_type = "instance"
     parser.num_workers = 1#16
     parser.phase = "train"
     parser.use_dropout=False
+    parser.current = current
+    parser.direction = "ab"
+    parser.num_sources = 2 #dataReplacer.getNumSources()
+    ##
+    parser.name = "normalaligner"
+    parser.num_epochs = 300
+    parser.features = 2
+    parser.model = "Flow2Flow"
+    parser.batch_size = 150#16
+    parser.iters_per_print= parser.batch_size
+    parser.lr =.005#.005# 2e-4
+    parser.rnvp_lr =.005#.005# 2e-4
+    parser.lambda_mle = 1. # 1.
     parser.is_training = False
-
 
 
     # Set up available GPUs

@@ -317,7 +317,7 @@ if __name__ == '__main__':
     parser.direction = "ab"
     ##
     parser.name = "mmoons"
-    parser.num_epochs = 300
+    parser.num_epochs = 175 #300
     parser.num_sources = 2
     parser.features = 2
     parser.model = "Flow2Flow"

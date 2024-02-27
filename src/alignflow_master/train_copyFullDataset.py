@@ -239,7 +239,7 @@ def train(args, dataReplacer: DataReplacer, y_inst):
     #vis.visualize(None, datA, y_inst, 0)
     vis.visualize(model, dataReplacer, y_inst, 0, True, args = args)
 
-
+    last = np.inf
 
     # Train
     while not logger.is_finished_training():
@@ -260,8 +260,10 @@ def train(args, dataReplacer: DataReplacer, y_inst):
                 #logger.log_scalars({'val_' + k: v for k, v in stats.items()})
                 #saver.save(logger.global_step, model,
                            #0, args.device)
-            saver.save(logger.global_step, model,
-                           0, args.device)
+            if  (logger.loss_dict["loss_g"] <= last):
+                last = logger.loss_dict["loss_g"]
+                saver.save(logger.global_step, model,
+                            0, args.device)
                 
         vis.addLoss(logger.loss_dict)
         vis.visualize(model, dataReplacer, y_inst, logger.epoch, True, args = args)
