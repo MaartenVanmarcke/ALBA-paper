@@ -1,4 +1,5 @@
 """ Data object containing the domains. """
+import numpy as np
 
 class DataBag:
 
@@ -7,9 +8,10 @@ class DataBag:
         self.bags = bags
         self.bags_labels = bags_labels
         self.X_inst = X_inst
-        self.y_inst = y_inst
+        self.y_inst = list(y_inst)
         self.n = len(self.y_inst)
         self.setLengths()
+        self.labeled = np.ones_like(y_inst)
 
     def isAnomaly(self, bag, idx):
         return self.y_inst[self.findFullIdx(bag, idx)]==1
@@ -28,10 +30,10 @@ class DataBag:
         return (index+idx)
     
     def label(self, bag, idx):
-        self.y_inst[self.findFullIdx(bag,idx)] = -2
+        self.labeled[self.findFullIdx(bag, idx)] = -2
 
     def isLabeled(self, bag, idx):
-        return self.y_inst[self.findFullIdx(bag, idx)]==-2
+        return self.labeled[self.findFullIdx(bag, idx)]==-2
 
     def measureAccuracy(self, predictions):
         print(predictions)

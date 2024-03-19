@@ -181,3 +181,6 @@ class Data:
         if copy:
             return np.copy(o)
         return o
+
+    def getlabels(self):
+        return self.labels_

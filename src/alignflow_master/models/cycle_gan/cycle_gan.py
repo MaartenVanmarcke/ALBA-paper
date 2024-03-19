@@ -1,11 +1,11 @@
 import os
-import torch
-import torch.nn as nn
-import util
+#import torch
+#import torch.nn as nn
+#import util
 
-from itertools import chain
-from models.patch_gan import PatchGAN
-from models.cycle_gan.resnet import ResNet
+#from itertools import chain
+#from models.patch_gan import PatchGAN
+#from models.cycle_gan.resnet import ResNet
 
 
 class CycleGAN(nn.Module):
@@ -206,6 +206,7 @@ class CycleGAN(nn.Module):
         self.opt_d.step()
 
     def get_loss_dict(self):
+        raise NotImplementedError("")
         """Get a dictionary of current errors for the model."""
         loss_dict = {
             # Generator loss
@@ -226,6 +227,7 @@ class CycleGAN(nn.Module):
         return loss_dict
 
     def get_image_dict(self):
+        raise NotImplementedError("")
         """Get a dictionary of current images (src, tgt_real, tgt_fake) for the model.
 
         Returns: Dictionary containing numpy arrays of shape (batch_size, num_channels, height, width).
@@ -247,6 +249,7 @@ class CycleGAN(nn.Module):
         return image_dict
 
     def on_epoch_end(self):
+        raise NotImplementedError("")
         """Callback for end of epoch.
 
         Update the learning rate by stepping the LR schedulers.
@@ -255,10 +258,12 @@ class CycleGAN(nn.Module):
             scheduler.step()
 
     def get_learning_rate(self):
+        raise NotImplementedError("")
         """Get the current learning rate"""
         return self.optimizers[0].param_groups[0]['lr']
 
     def _data_parallel(self):
+        raise NotImplementedError("")
         self.g_src = nn.DataParallel(self.g_src, self.gpu_ids).to(self.device)
         self.g_tgt = nn.DataParallel(self.g_tgt, self.gpu_ids).to(self.device)
         if self.is_training:

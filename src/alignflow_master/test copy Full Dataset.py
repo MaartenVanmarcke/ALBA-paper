@@ -346,15 +346,15 @@ if __name__ == '__main__':
     parser.gpu_ids = []#[0]#[0,1,2,3]
     parser.iters_per_visual =320 
     parser.norm_type= "instance" 
-    parser.num_blocks= 0#4 
-    parser.num_channels_g = 1#32 
+    parser.num_blocks= np.NaN#0#4 
+    parser.num_channels_g = np.NaN#1#32 
     parser.num_scales= 2 
     parser.use_dropout= False 
     parser.use_mixer =True 
-    parser.num_channels = 1
-    parser.num_channels_d = 1
+    parser.num_channels = np.NaN#1
+    parser.num_channels_d = np.NaN#1
     parser.initializer = "normal"
-    parser.kernel_size_d = 1
+    parser.kernel_size_d = np.NaN#1
     parser.iters_per_visual = 256
     parser.iters_per_eval = 100
     parser.max_ckpts = 5
@@ -390,10 +390,10 @@ if __name__ == '__main__':
     parser.num_sources = 2 #dataReplacer.getNumSources()
     ##
     parser.name = "normalaligner"
-    parser.num_epochs = 300
+    parser.num_epochs = 200
     parser.features = 2
     parser.model = "Flow2Flow"
-    parser.batch_size = 150#16
+    parser.batch_size = 100#16
     parser.iters_per_print= parser.batch_size
     parser.lr =.005#.005# 2e-4
     parser.rnvp_lr =.005#.005# 2e-4

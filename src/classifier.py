@@ -13,6 +13,8 @@ from anomatools.models import SSDO
 from pyod.models.iforest import IForest
 from IForestWrap import IForestWrap
 
+np.random.seed(1302)
+
 # -----------------------------------------------------------------------------------------
 # Classifier
 # -----------------------------------------------------------------------------------------
@@ -87,6 +89,8 @@ class Classifier:
         prior.fit(X)
         #train_prior = prior.decision_scores_
         #test_prior = prior.decision_function(X)
+        ss = prior.decision_function(X)
+        self.minim, self.maxim = np.min(ss), np.max(ss)
         
         # SSDO
         detector = SSDO(base_detector=prior, k=7)  ## TODO: change k
@@ -107,6 +111,12 @@ class Classifier:
         # SSDO: [-1: normal, 1: anomaly]
         predictions = self.clf[1].predict(X)
         return predictions
+    
+    def _threshold(self):
+        return (self.clf[0].threshold_-self.minim)/(self.maxim-self.minim)
+    
+    def _decision_function(self, X):
+        return self.clf[0].decision_function(X)
 
 
 # -----------------------------------------------------------------------------------------

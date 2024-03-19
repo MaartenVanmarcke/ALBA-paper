@@ -7,6 +7,7 @@ from itertools import chain
 from models.patch_gan import PatchGAN
 from models.real_nvp import RealNVP, RealNVPLoss
 
+torch.manual_seed(1302)
 
 class Flow2Flow(nn.Module):
     """Flow2Flow Model
@@ -153,7 +154,12 @@ class Flow2Flow(nn.Module):
 
         # Backprop
         self.loss_d = sum(self.loss_d_tgt)
-        self.loss_d.backward()
+        if not isinstance(self.loss_d, int):
+            self.loss_d.backward()
+        else:
+            # No discriminator loss, so there should only be one bag (else there is a bug)
+            if self.num_sources != 1:
+                raise Exception("Implementation error")
 
     def backward_g(self):
         if self.clamp_jacobian:

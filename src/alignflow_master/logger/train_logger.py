@@ -15,6 +15,7 @@ class TrainLogger(BaseLogger):
 
         self.batch_size = args.batch_size
         self.iters_per_print = args.iters_per_print
+        self.epochs_per_print = args.epochs_per_print
         self.num_visuals = args.num_visuals
         self.num_epochs = args.num_epochs
 
@@ -37,6 +38,9 @@ class TrainLogger(BaseLogger):
             # Write the current error report
             self.loss_dict = self.model.get_loss_dict()
             loss_keys = ['loss_g', 'loss_gan', 'loss_mle', 'loss_d']  # Can add other losses here (e.g., 'loss_g_l1').
+            for k in loss_keys:
+                if k not in self.loss_dict.keys():
+                    loss_keys.remove(k)
             loss_strings = ['{}: {:.3g}'.format(k, self.loss_dict[k]) for k in loss_keys]
             message += ', '.join(loss_strings)
 
@@ -49,7 +53,8 @@ class TrainLogger(BaseLogger):
                     k = 'g/' + k
                 self.summary_writer.add_scalar(k, v, self.global_step)
 
-            self.write(message)
+            if (self.epoch) % self.epochs_per_print == 0 or self.epoch == 1:
+                self.write(message)
 
         
 
@@ -57,11 +62,14 @@ class TrainLogger(BaseLogger):
         """Log info for start of an epoch."""
         self.epoch_start_time = time()
         self.iter = 0
-        self.write('[start of epoch {}]'.format(self.epoch))
+        if (self.epoch) % self.epochs_per_print == 0 or self.epoch == 1:
+            self.write('[start of epoch {}]'.format(self.epoch))
 
     def end_epoch(self):
         """Log info for end of an epoch. Save model parameters and update learning rate."""
-        self.write('[end of epoch {}, epoch time: {:.2f}]'.format(self.epoch, time() - self.epoch_start_time))
+        
+        if (self.epoch) % self.epochs_per_print == 0 or self.epoch == 1:
+            self.write('[end of epoch {}, epoch time: {:.2f}]'.format(self.epoch, time() - self.epoch_start_time))
 
         # Update the learning rate according to the LR schedulers
         self.model.on_epoch_end()

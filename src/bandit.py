@@ -125,19 +125,18 @@ def solver_rotten_swa(K, T, t, counts, R, rewardInfo: RewardInfo, **kwargs):
         * (np.log(np.sqrt(2) * T) ** (1 / 3))
     )
 
+    rewardInfo.setIterationEndRoundRobin(M*K)
+
 
     if t < M * K:
         # ramp-up: selection by Round-Robin (i.e., just pick one with smallest count)
-        if (t==0): ## TODO: this makes it slower, change this!
-            rewardInfo.startRoundRobin()
+        
         index = {i: 1.0 / (c + 1.0) for i, c in enumerate(counts)}
 
     else:
         # balanced selection: select the arm that maximizes average payoff over window size M
         # requires access to the reward sequence per arm
-        if (rewardInfo.isInRoundRobin()):  ## TODO: this makes it slower, change this!
-            rewardInfo.setIterationEndRoundRobin(t)
-            rewardInfo.endRoundRobin()
+        
         index = {}
         for i, rs in R.items():
             mu_i = (1 / M) * np.sum(rs[-M:])
@@ -313,7 +312,6 @@ class DomainArm(Arm):
 
     def update_reward(self, prob1=None, pred1=None):
         """ Update the reward for this arm. """
-
         # update the reward
         if not ((self.prob0 is None) and (self.pred0 is None)):
             if self.metric == "entropy":

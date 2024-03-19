@@ -26,6 +26,8 @@ class RewardInfo:
         self.inRoundRobin = True
         self.RoundRobinEndIteration = -1
 
+        self.aucs = {}
+
     def setIterationEndRoundRobin(self, iteration:int):
         self.RoundRobinEndIteration = iteration
 
@@ -70,6 +72,15 @@ class RewardInfo:
             raise Exception("Unvalid argument")
         for bag in range(len(rewards.keys())):
             self.updateBanditReward(bag, rewards[bag])
+
+    def updateAuc(self, name: str, auc: float):
+        if (name not in self.aucs.keys()):
+            self.aucs[name] = [auc]
+        else:
+            self.aucs[name].append(auc)
+
+    def getAUC(self):
+        return self.aucs
 
     def getBanditRewards(self, bag:int):
         return self.banditRewards[bag]
