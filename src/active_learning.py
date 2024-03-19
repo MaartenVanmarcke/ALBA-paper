@@ -29,7 +29,7 @@ def active_learning(
                     probs = classifier.predict_proba(X)
                 else:
                     probs = classifier.predict(key, X, probabilities=True)
-                probs = probs[:, 1].flatten()
+                probs = probs.flatten()
                 scores = entropy_scores(probs) + 0.1
 
             elif al_strategy.lower() == "random":

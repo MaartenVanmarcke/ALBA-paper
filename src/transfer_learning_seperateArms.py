@@ -16,7 +16,8 @@ from classifier import Classifier
 from ReliableMSTL.KernelUtil import kernel_mean_matching, mmd
 
 
-def get_transfer_classifier(transfer_function, modus, transfer_settings={}):
+def get_transfer_classifier(transfer_function, modus, transfer_settings={}, cont_factor = None):
+    print(str(transfer_function))
     if len(transfer_settings) == 0:
         transfer_settings = initialize_transfer_settings(transfer_function)
     if transfer_function == 'locit':
@@ -45,14 +46,15 @@ class NoTransferClassifier:
     def __init__(self, modus='anomaly'):
         super().__init__()
 
-        self.classifier = None
+        self.classifiers = OrderedDict({})
+
         self.modus = modus
 
     def apply_transfer(self, data=None):
         pass
 
     def fit_all(self, data, ignore_unchanged=False):
-        '''for key in data.keys_:
+        for key in data.keys_:
             y = data.get_domain_labels(key)
             nl = np.count_nonzero(y)
             if not(ignore_unchanged) or (nl > data.get_processed_label_count(key)):
@@ -60,31 +62,23 @@ class NoTransferClassifier:
                 clf = Classifier(modus=self.modus)
                 clf.fit(X, y)
                 self.classifiers[key] = clf
-            data.set_processed_label_count(key, nl)'''
-        y = np.zeros((0))
-        X = np.zeros((0,2))
-        noChange = True
-        for key in data.keys_:
-            y = np.concatenate((y,data.get_domain_labels(key)))
-            X = np.concatenate((X,data.get_domain(key)))
-            nl = np.count_nonzero(data.get_domain_labels(key))
-            if not(ignore_unchanged) or (nl > data.get_processed_label_count(key)):
-                noChange = False
             data.set_processed_label_count(key, nl)
-        # Train whole new classifier? Or old classifier with one training instance?
-        if (noChange == False):
-            clf = Classifier(modus=self.modus)
-            clf.fit(X, y)
-            self.classifier = clf
 
-    def predict(self, train_key, X, probabilities=False):
-        if probabilities:
-            scores = self.classifier.predict_proba(X)
-            probabs = scores/self.classifier._threshold()
-            xx = 1-np.power(2, -probabs)
-            return xx
+    def _predict(self, train_key, X, probabilities=False):
+        if probabilities:            
+            return self.classifiers[train_key]._decision_function(X)
         else:
-            return self.classifier.predict(X)
+            return self.classifiers[train_key].predict(X)
+
+        
+    def predict(self, test_data, probabilities=True):
+        predictions = OrderedDict({})
+        for key in test_data.keys_:
+            X = test_data.get_domain(key)
+            predictions[key] = self._predict(key, X, probabilities)
+
+
+        return predictions
 
 
 

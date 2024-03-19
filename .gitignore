@@ -143,3 +143,7 @@ src/colorimg/
 src/img/iteration000.png
 src/*.avi
 *.avi
+src/logs
+src/img
+logs
+src/distributionAlignment/*.csv
