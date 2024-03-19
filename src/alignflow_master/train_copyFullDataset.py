@@ -57,7 +57,7 @@ class Visualizer():
                     total += val
         self.totalloss.append(total)
 
-    def visualizeLoss(self):
+    def visualizeLoss(self, args = None):
         fig, ax = plt.subplots( nrows=1, ncols=1)#, figsize = (15,9) )  # create figure & 1 axis
 
         for key, val in self.loss_dict.items():
@@ -69,7 +69,7 @@ class Visualizer():
         plt.xlabel("epoch")
         plt.ylabel("loss")
         plt.legend()
-        fig.savefig(os.path.join(current,'alignflow_master','img','loss.png'),bbox_inches='tight')
+        fig.savefig(os.path.join(args.current,'img','loss.png'),bbox_inches='tight')
         plt.close(fig)
 
     
@@ -145,6 +145,7 @@ class Visualizer():
 
         fig, ax = plt.subplots( nrows=1, ncols=1, figsize = (15,9) )  # create figure & 1 axis
 
+        plt.rcParams.update({'font.size': 18})
         for bag in y_inst.keys():
             domain = D[bag]
             anomalies = []
@@ -170,13 +171,12 @@ class Visualizer():
             if (len(normals)>0):
                 ax.scatter(normals[:,0], normals[:,1], marker='.', c=c, s=250-200*s2, label = "Bag "+str(bag))#, c= 'b')
             if (len(anomalies)>0):
-                ax.scatter(anomalies[:,0], anomalies[:,1],  marker='+', c=c, s=250-200*s1, label = "Anomalies "+str(bag))#,c= 'b')   
+                ax.scatter(anomalies[:,0], anomalies[:,1],  marker='+', c=c, s=250-200*s1, label = "Anomalies bag "+str(bag))#,c= 'b')   
 
         '''for bag in range(len(bags)):
             domain = bags[bag]
             if (len(domain)>0):
                 ax.scatter(domain[:,0], domain[:,1], c=next(cycol))'''
-        print(epoch)
         """if epoch == 0:
             self.ylim = ax.get_ylim()
             self.ylim= (min(-3,self.ylim[0]),max(3,self.ylim[1]))
@@ -184,12 +184,16 @@ class Visualizer():
             self.xlim = (min(-3,self.xlim[0]),max(3,self.xlim[1]))
         ax.set_ylim(self.ylim )
         ax.set_xlim(self.xlim)"""
-        plt.title('Aligned 2D Toy Data Set - Epoch '+str(epoch))
-        plt.legend()
+        if epoch == "result":
+            plt.title('Aligned 2D Toy Data Set')
+        else:
+            plt.title('Aligned 2D Toy Data Set - Epoch '+str(epoch))
+        #plt.legend()
         fig.savefig(os.path.join(args.current, 'img','epoch'+str(epoch)+'.png'),bbox_inches='tight')
         plt.close(fig)
 
     def makevideo(self):
+        return
         import cv2
         import os
 
@@ -240,11 +244,21 @@ def train(args, dataReplacer: DataReplacer, y_inst):
     vis.visualize(model, dataReplacer, y_inst, 0, True, args = args)
 
     last = np.inf
+    print(torch.cuda.is_available())
+    import time
+    xxx  =time.time()
+    print("START", xxx)
 
+    summm = 0
+    thedata = None
     # Train
     while not logger.is_finished_training():
         logger.start_epoch()
-        for batch in train_loader:
+        if thedata == None:
+            thedata = []
+            for batch in train_loader:
+                thedata.append(batch)
+        for batch in thedata:
             logger.start_iter()
 
             # Train over one batch
@@ -253,13 +267,13 @@ def train(args, dataReplacer: DataReplacer, y_inst):
 
             logger.end_iter()
 
-            # Evaluate
-            #if logger.global_step % args.iters_per_eval < args.batch_size:
-                #criteria = {'MSE_src2tgt': mse, 'MSE_tgt2src': mse}
-                #stats = evaluate(moSdel, val_loader, criteria)
-                #logger.log_scalars({'val_' + k: v for k, v in stats.items()})
-                #saver.save(logger.global_step, model,
-                           #0, args.device)
+                # Evaluate
+                #if logger.global_step % args.iters_per_eval < args.batch_size:
+                    #criteria = {'MSE_src2tgt': mse, 'MSE_tgt2src': mse}
+                    #stats = evaluate(moSdel, val_loader, criteria)
+                    #logger.log_scalars({'val_' + k: v for k, v in stats.items()})
+                    #saver.save(logger.global_step, model,
+                            #0, args.device)
             if  (logger.loss_dict["loss_g"] <= last):
                 last = logger.loss_dict["loss_g"]
                 saver.save(logger.global_step, model,
@@ -268,9 +282,11 @@ def train(args, dataReplacer: DataReplacer, y_inst):
         vis.addLoss(logger.loss_dict)
         vis.visualize(model, dataReplacer, y_inst, logger.epoch, True, args = args)
 
-        logger.end_epoch()
+        logger.end_epoch()  
+    print("END", time.time()-xxx)
+    print("summm", summm)
     vis.makevideo()
-    vis.visualizeLoss()
+    vis.visualizeLoss(args = args)
 
 
 def get_data_loaders(args,data):
@@ -307,15 +323,15 @@ def main(dataReplacer:DataReplacer, y_inst, load: bool = False):
     parser.gpu_ids = []#[0]#[0,1,2,3]
     parser.iters_per_visual =320 
     parser.norm_type= "instance" 
-    parser.num_blocks= 0#4 
-    parser.num_channels_g = 1#32 
+    parser.num_blocks= np.NaN#0#4 
+    parser.num_channels_g = np.NaN#1#32 
     parser.num_scales= 2 
     parser.use_dropout= False 
     parser.use_mixer =True 
-    parser.num_channels = 1
-    parser.num_channels_d = 1
+    parser.num_channels = np.NaN#1
+    parser.num_channels_d = np.NaN#1
     parser.initializer = "normal"
-    parser.kernel_size_d = 1
+    parser.kernel_size_d = np.NaN#1
     parser.iters_per_visual = 256
     parser.iters_per_eval = 100
     parser.max_ckpts = 5
@@ -352,14 +368,15 @@ def main(dataReplacer:DataReplacer, y_inst, load: bool = False):
     ##
     parser.modelload = load
     parser.name = "normalaligner"
-    parser.num_epochs = 300
+    parser.num_epochs = 200#300
     parser.features = 2
     parser.model = "Flow2Flow"
-    parser.batch_size = 300#16
+    parser.batch_size = 30# 30#16
     parser.iters_per_print= parser.batch_size
     parser.lr =.005#.005# 2e-4
     parser.rnvp_lr =.005#.005# 2e-4
-    parser.lambda_mle = 1. # 1.
+    parser.lambda_mle = 1. # 1e-4
+    parser.epochs_per_print = 5
 
 
     # Set up available GPUs
@@ -371,7 +388,7 @@ def main(dataReplacer:DataReplacer, y_inst, load: bool = False):
         parser.device = 'cpu'
 
     # Set up save dir and output dir (test mode only)
-    parser.save_dir = os.path.join(parser.current, parser.checkpoints_dir, parser.name)
+    parser.save_dir = os.path.join(parser.checkpoints_dir, parser.name)
     os.makedirs(parser.save_dir, exist_ok=True)
     if parser.is_training:
         '''with open(os.path.join(parser.save_dir, 'args.json'), 'w') as fh:
@@ -392,9 +409,79 @@ def main(dataReplacer:DataReplacer, y_inst, load: bool = False):
 
 
     train(parser, dataReplacer, res)
+    
+    model = models.__dict__[parser.model](parser)
+    model = ModelSaver.load_model(model, os.path.join(parser.save_dir, "best.pth.tar"), parser.gpu_ids, is_training=True)
+    #model.train()
+    Visualizer().visualize(model, dataReplacer, res, "result", True, args = parser)
 
 
 if __name__ == '__main__':
+    np.random.seed(1302)
+
+    ff = np.zeros((90,2))
+    for i in range(len(ff)):
+            ff[i,:] = np.random.uniform(-1,1,size = ((1,2)))
+            while ff[i,1]>-.3 and abs(ff[i,0]) < .5:
+                ff[i,:] = np.random.uniform(-1,1,size = ((1,2)))
+
+    dd = np.hstack((np.random.uniform(-2,-1.25,size=((100,1))), np.random.uniform(-1.5,0.5, size = ((100,1)))))
+
+    ## TODO: delete this
+    datA = {0: np.concatenate((ff, np.hstack((np.random.uniform(-.25,.25,size=((10,1))), np.random.uniform(0,1,size = ((10,1))))))), 1: dd}
+    y_inst = {0: np.concatenate((np.zeros((90)), np.ones((10)))), 1: np.zeros((100))}
+    weights = {0: np.concatenate((np.zeros((90)), 0.9*np.ones((10)))), 1: np.zeros((100))}
+
+
     dataReplacer = DataReplacer(num_sources=len(datA))
     dataReplacer.setInitData(datA)
-    main(dataReplacer, y_inst)
+
+
+    ## TODO delete this
+    dataReplacer.setWeights(weights)
+
+    main(dataReplacer, y_inst, load = False)
+
+
+    D = datA
+    fig, ax = plt.subplots( nrows=1, ncols=1, figsize = (15,9) )  # create figure & 1 axis
+    clrs = ['b','g','r','c','m','k','y', 'lime','deeppink','aqua','yellow','gray','darkorange','saddlebrown','salmon']
+    from itertools import cycle
+    cycol = cycle(clrs)
+    w = weights
+    
+    tick_font_size = 18
+    plt.rcParams.update({'font.size': 18})
+
+    for bag in y_inst.keys():
+        domain = D[bag]
+        anomalies = []
+        normals = []
+        D[bag] = np.asarray(domain.tolist())
+        s1 = []
+        s2 = []
+        for idx in range(len(domain)):
+            if y_inst[bag][idx] == 1:
+                anomalies.append(domain[idx])
+                s1.append(w[bag][idx])
+
+            else:
+                normals.append(domain[idx])
+                s2.append(w[bag][idx])
+
+        s1 = np.asarray(s1)
+        s2 = np.asarray(s2)
+        anomalies = np.asarray(anomalies)
+        normals = np.asarray(normals)
+
+        c=next(cycol)
+        if (len(normals)>0):
+            ax.scatter(normals[:,0], normals[:,1], marker='.', c=c, s=250-200*s2, label = "Bag "+str(bag))#, c= 'b')
+        if (len(anomalies)>0):
+            ax.scatter(anomalies[:,0], anomalies[:,1],  marker='+', c=c, s=250-200*s1, label = "Anomalies bag"+str(bag))#,c= 'b')   
+        
+        plt.title('Generated 2D Toy Data Set')
+        fig.savefig(os.path.join(pathlib.Path(__file__).parent.resolve(), 'img','originalSimple.png'),bbox_inches='tight')
+        plt.close(fig)
+
+        

@@ -98,7 +98,7 @@ class MABMethod:
                 self.tf_function, self.modus
             )  # could be none
             self.classifier.apply_transfer(train_data)
-        self.classifier.fit_all(train_data, ignore_unchanged=True)
+        self.classifier.fit_all(train_data, ignore_unchanged=False)
 
         ## QUESTION: where is the for loop?? 
         ##      -> do you take the first query in the variable <queries> and then call fit_query again? Until self.query_budget times? 
@@ -131,9 +131,15 @@ class MABMethod:
 
     def predict(self, test_data, probabilities=False):
         predictions = OrderedDict({})
+        X = np.zeros((0,2))
+        nl = np.zeros((1))
         for key in test_data.keys_:
-            X = test_data.get_domain(key)
-            predictions[key] = self.classifier.predict(key, X, probabilities)
+            X = np.concatenate((X,test_data.get_domain(key)))
+            nl = np.append(nl, len(list(X)))
+        prs = self.classifier.predict(0, X, probabilities)
+        for key in test_data.keys_:
+            predictions[key] = prs[int(nl[key]):int(nl[key+1])]
+
         return predictions
 
     ## Line 5: clustering the data
@@ -232,11 +238,16 @@ class MABMethod:
         ## line 14
         all_probs = {}
         all_preds = {}
+        X = np.zeros((0,2))
+        nl = np.zeros((1))
         for key in train_data.keys_:
-            X = train_data.get_domain(key)
-            probs = self.classifier.predict(key, X, True)
-            all_probs[key] = probs.flatten()
-            all_preds[key] = self.classifier.predict(key, X, False)
+            X = np.concatenate((X,train_data.get_domain(key)))
+            nl = np.append(nl, len(list(X)))
+        probs = self.classifier.predict(0, X, True)
+        preds = self.classifier.predict(0, X, False)
+        for key in train_data.keys_:
+            all_probs[key] = probs[int(nl[key]):int(nl[key+1])].flatten()
+            all_preds[key] = preds[int(nl[key]):int(nl[key+1])]
 
         for ID, cluster in self.armed_bandits.items():
             k = cluster["domain"]
