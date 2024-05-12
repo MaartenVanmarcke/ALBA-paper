@@ -22,7 +22,7 @@ class PatchGAN(nn.Module):
 
         # Double channels for conditional GAN (concatenated src and tgt images)
 
-        layers += [nn.Linear(2,3),
+        layers += [nn.Linear(args.features,3),
                    nn.LeakyReLU(0.2, True)]
 
         layers += [nn.Linear(3,2),

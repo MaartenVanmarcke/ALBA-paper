@@ -11,6 +11,14 @@ from classifier import Classifier
 from transfer_learning import get_transfer_classifier
 from rewardInfo import RewardInfo
 
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 # -----------------------------------------------------------------------------------------
 # Separate detector baseline
@@ -48,7 +56,7 @@ class MABMethod:
         modus="anomaly",
         transfer_function="none",
         mab="none",
-        mabreward="entropy",
+        mabreward=None,#"entropy",
         mab_alpha=1.0,
         mab_sigma=0.1,
         abstraction_level=0,
@@ -83,7 +91,7 @@ class MABMethod:
         self.rewardInfo = rewardInfo
 
     ## The algorithm!!
-    def fit_query(self, train_data, return_debug_info=False):
+    def fit_query(self, train_data, probs, return_debug_info=False):
 
         ## Line 5
         # first iteration: divide the domain in clusters (smart or naive strategy)
@@ -98,18 +106,18 @@ class MABMethod:
                 self.tf_function, self.modus
             )  # could be none
             self.classifier.apply_transfer(train_data)
-        self.classifier.fit_all(train_data, ignore_unchanged=False)
+        self.classifier.fit_all(train_data, probs, ignore_unchanged=False)
 
         ## QUESTION: where is the for loop?? 
         ##      -> do you take the first query in the variable <queries> and then call fit_query again? Until self.query_budget times? 
         # mab strategy
         ## line 14 & 10: estimate payoffs and thén get order of arms to play
-        play_order = self._play_multi_armed_bandit(train_data)
+        play_order = self._play_multi_armed_bandit(train_data, probs)
 
         # instance selection within each domain
         ## line 11
         all_scores = active_learning(
-            train_data.keys_, train_data, self.classifier, self.al_strategy
+            train_data.keys_, train_data, self.classifier, self.al_strategy, prior= probs
         )
 
         # sort queries based on the play_order
@@ -129,14 +137,15 @@ class MABMethod:
         self.iteration_ += 1
         return queries
 
-    def predict(self, test_data, probabilities=False):
+    def predict(self, test_data, probs,probabilities=False):
         predictions = OrderedDict({})
-        X = np.zeros((0,2))
+        n_features = test_data.get_domain(0).shape[1]
+        X = np.zeros((0,n_features))
         nl = np.zeros((1))
         for key in test_data.keys_:
             X = np.concatenate((X,test_data.get_domain(key)))
             nl = np.append(nl, len(list(X)))
-        prs = self.classifier.predict(0, X, probabilities)
+        prs = self.classifier.predict(0, X, probs,probabilities)
         for key in test_data.keys_:
             predictions[key] = prs[int(nl[key]):int(nl[key+1])]
 
@@ -211,7 +220,7 @@ class MABMethod:
         else:
             raise Exception("INPUT: unknown `abstraction_strat`")
 
-    def _play_multi_armed_bandit(self, train_data):
+    def _play_multi_armed_bandit(self, train_data, probs):
 
         # TODO: code to deal with very small clusters
 
@@ -238,21 +247,23 @@ class MABMethod:
         ## line 14
         all_probs = {}
         all_preds = {}
-        X = np.zeros((0,2))
+        n_features = train_data.get_domain(0).shape[1]
+        X = np.zeros((0,n_features))
         nl = np.zeros((1))
         for key in train_data.keys_:
             X = np.concatenate((X,train_data.get_domain(key)))
             nl = np.append(nl, len(list(X)))
-        probs = self.classifier.predict(0, X, True)
-        preds = self.classifier.predict(0, X, False)
+        probs = self.classifier.predict(0, X, probs, True)
+        preds = self.classifier.predict(0, X, probs, False)
         for key in train_data.keys_:
             all_probs[key] = probs[int(nl[key]):int(nl[key+1])].flatten()
             all_preds[key] = preds[int(nl[key]):int(nl[key+1])]
 
-        for ID, cluster in self.armed_bandits.items():
-            k = cluster["domain"]
-            ixs = cluster["indices"]
-            self.arms[ID].update_reward(all_probs[k][ixs], all_preds[k][ixs])
+        if self.iteration_ == 0:
+            for ID, cluster in self.armed_bandits.items():
+                k = cluster["domain"]
+                ixs = cluster["indices"]
+                self.arms[ID].update_reward(all_probs[k][ixs], all_preds[k][ixs],np.linalg.norm(train_data.get_domain(k)))
 
         # get reward for the played arm last time
         # this can only start from the second round
@@ -261,6 +272,9 @@ class MABMethod:
             for ID, cluster in self.armed_bandits.items():
                 if last_labeled[0] == cluster["domain"]:
                     if last_labeled[1] in cluster["indices"]:
+                        k = cluster["domain"]
+                        ixs = cluster["indices"]
+                        self.arms[ID].update_reward(all_probs[k][ixs], all_preds[k][ixs],np.linalg.norm(train_data.get_domain(k)))
                         self.i = ID
                         break
             ## Tell from which cluster (arm) you have queried

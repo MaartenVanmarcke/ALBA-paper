@@ -7,7 +7,14 @@ from .bandit import MAB, DomainArm
 from .classifier import Classifier
 from .transfer_learning import get_transfer_classifier
 
-
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 # -----------------------------------------------------------------------------------------
 # Separate detector baseline - simply divide the budget equally per domain
 # -----------------------------------------------------------------------------------------

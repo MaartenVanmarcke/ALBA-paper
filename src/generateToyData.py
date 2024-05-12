@@ -1,6 +1,8 @@
 import numpy as np
 from math import floor
 
+np.random.seed(1302)
+
 def gen_simple_data(k, nbags, bag_contfactor = 0.1, seed = 331):
     np.random.seed(seed)
     nbrgauss = floor(nbags*k*(1-bag_contfactor))

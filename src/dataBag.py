@@ -1,6 +1,15 @@
 """ Data object containing the domains. """
 import numpy as np
 
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
+
 class DataBag:
 
     def __init__(self, bags, bags_labels, X_inst, y_inst):
@@ -13,13 +22,33 @@ class DataBag:
         self.setLengths()
         self.labeled = np.ones_like(y_inst)
 
+        self.anomalies = {}
+        self.normals = {}
+        for bag in range(len(bags)):
+            self.anomalies[bag] = []
+            self.normals[bag] = []
+            domain = bags[bag]
+            for idx in range(len(domain)):
+                if self.isAnomaly(bag, idx):
+                    self.anomalies[bag].append(domain[idx])
+                else:
+                    self.normals[bag].append(domain[idx])
+            self.anomalies[bag] = np.asarray(self.anomalies[bag])
+            self.normals[bag] = np.asarray(self.normals[bag])
+
+    def getNormals(self, bag):
+        return self.normals[bag]
+    
+    def getAnomalies(self, bag):
+        return self.anomalies[bag]
+
     def isAnomaly(self, bag, idx):
         return self.y_inst[self.findFullIdx(bag, idx)]==1
 
     def setLengths(self):
         self.lengths = {}
-        for key in range(self.bags.shape[0]):
-            self.lengths[key] = self.bags[key,:,:].shape[0]
+        for key in range(len(self.bags)):
+            self.lengths[key] = self.bags[key][:,:].shape[0]
 
     def findFullIdx(self, bag, idx):
         k = 0

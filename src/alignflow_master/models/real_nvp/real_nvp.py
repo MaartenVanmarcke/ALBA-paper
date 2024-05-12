@@ -25,7 +25,7 @@ class RealNVP(nn.Module):
         no_latent (bool): If True, assume both `x` and `z` are image distributions.
             So we should pre-process the same in both directions. E.g., True in CycleFlow.
     """
-    def __init__(self, un_normalize_x=False, no_latent=False):
+    def __init__(self, n_features, un_normalize_x=False, no_latent=False):
         super(RealNVP, self).__init__()
         # Register data_constraint to pre-process images, not learnable
         self.register_buffer('data_constraint', torch.tensor([0.9], dtype=torch.float32))
@@ -34,7 +34,7 @@ class RealNVP(nn.Module):
         self.no_latent = no_latent
 
         # Get inner layers
-        self.flows = _RealNVP()
+        self.flows = _RealNVP(n_features)
 
     def forward(self, x, reverse=False):
         sldj = None
@@ -99,23 +99,23 @@ class _RealNVP(nn.Module):
         num_blocks (int): Number of residual blocks in the s and t network of
             `Coupling` layers.
     """
-    def __init__(self):
+    def __init__(self, n_features):
         super(_RealNVP, self).__init__()
 
         self.in_couplings = nn.ModuleList([
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=False),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=True),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=False),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=True),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=False),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=True),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=False),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=True),
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=False),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=False),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=True),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=False),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=True),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=False),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=True),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=False),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=True),
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=False),
         ])
 
         self.in_couplings.append(
-            CouplingLayer(MaskType.CHECKERBOARD, reverse_mask=True))
+            CouplingLayer(n_features, MaskType.CHECKERBOARD, reverse_mask=True))
         '''else:
             self.out_couplings = nn.ModuleList([
                 CouplingLayer(MaskType.CHANNEL_WISE, reverse_mask=False),

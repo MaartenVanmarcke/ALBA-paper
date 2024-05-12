@@ -1,7 +1,15 @@
 """ Active learning funtionality. """
 
 import numpy as np
-
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+print(p)
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 # -----------------------------------------------------------------------------------------
 # Active learning with domain preselection
@@ -9,7 +17,7 @@ import numpy as np
 
 ## Choose the instance in a cluster (arm) to be queried -> line 11
 def active_learning(
-    domain_keys, train_data, classifier, al_strategy="entropy", single_classifier=False
+    domain_keys, train_data, classifier, al_strategy="entropy", single_classifier=False, prior = None
 ):
     """Two options:
     1. domain_key = None --> no domain preselection, active learning over all domains
@@ -28,7 +36,7 @@ def active_learning(
                 if single_classifier:
                     probs = classifier.predict_proba(X)
                 else:
-                    probs = classifier.predict(key, X, probabilities=True)
+                    probs = classifier.predict(key, X, prior, probabilities=True)
                 probs = probs.flatten()
                 scores = entropy_scores(probs) + 0.1
 

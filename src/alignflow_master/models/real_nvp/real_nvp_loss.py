@@ -13,10 +13,11 @@ class RealNVPLoss(nn.Module):
     See Also:
         Equation (3) in the RealNVP paper: https://arxiv.org/abs/1605.08803
     """
-    def __init__(self, k=256):
+    def __init__(self, n_features, k=256):
         super(RealNVPLoss, self).__init__()
         self.k = k
-        self.volume = self._volumeNball(2, 3) # sigma = 1; TODO: generalize 2 to num_dimension !!! 
+        self.n_features = n_features
+        self.volume = self._volumeNball(self.n_features, 5) # sigma = 1; TODO: generalize 2 to num_dimension !!! 
 
     def forward(self, z, sldj, weights = None):
         if weights == None:
@@ -61,7 +62,7 @@ class RealNVPLoss(nn.Module):
                 return 0*nll
             else:
                 return nll/nrm
-            
+                
         return nll
 
     def _volumeNball(self, n, R):

@@ -13,7 +13,14 @@ from anomatools.models import SSDO
 from pyod.models.iforest import IForest
 from IForestWrap import IForestWrap
 
-np.random.seed(1302)
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 # -----------------------------------------------------------------------------------------
 # Classifier
@@ -80,17 +87,24 @@ class Classifier:
         return predictions
 
     # ANOMALY DETECTION
-    def _anomaly_fit(self, X, y=None, w=None):
+    def _anomaly_fit(self, X, y=None, w=None, prior = None ):
+        if prior == None:
+            raise NotImplementedError("You need to specify a prior: loglike or IF")
         if y is None:
             y = np.zeros(len(X), dtype=int)
         # Isolation Forest prior
         # TODO: random_state=i
-        prior = IForestWrap(n_estimators=200, contamination=self.c_, random_state = 0)
-        prior.fit(X)
+        if prior == "IF":
+            prior = IForestWrap(n_estimators=200, contamination=self.c_, random_state = 0)
+            prior.fit(X)
+            ss = prior.decision_function(X)
+            self.minim, self.maxim = np.min(ss), np.max(ss)
+
+        if prior == "loglike":
+            prior = newAnomalyDetectorNorm()
+            prior.fit(X)
         #train_prior = prior.decision_scores_
         #test_prior = prior.decision_function(X)
-        ss = prior.decision_function(X)
-        self.minim, self.maxim = np.min(ss), np.max(ss)
         
         # SSDO
         detector = SSDO(base_detector=prior, k=7)  ## TODO: change k
@@ -100,23 +114,37 @@ class Classifier:
 
     def _anomaly_predict_proba(self, X):
         # iforest prior
-        test_prior = self.clf[0].decision_function(X)
+        #test_prior = self.clf[0].decision_function(X)
         # SSDO: probabilities [0: normal, 1: anomaly]
         probabilities = self.clf[1].predict_proba(X)[:,1]
+        self.probabs = probabilities
         return probabilities
 
     def _anomaly_predict(self, X):
         # iforest prior
-        test_prior = self.clf[0].decision_function(X)
+        #test_prior = self.clf[0].decision_function(X)
         # SSDO: [-1: normal, 1: anomaly]
         predictions = self.clf[1].predict(X)
         return predictions
     
-    def _threshold(self):
-        return (self.clf[0].threshold_-self.minim)/(self.maxim-self.minim)
+    def _threshold(self, prior = None ):
+        if prior == None:
+            raise NotImplementedError("You need to specify a prior: loglike or IF")
+        idxs = np.flip(np.argsort(self.probabs))
+        self.cont_factor = .1
+        idx1 = int(np.floor(len(idxs)*self.cont_factor))
+        self.threshold = np.mean(self.probabs[idxs[idx1:idx1+1]])
+        return self.threshold
+        """if prior == "loglike":
+            return self.clf[0]._threshold()
+        if prior == "IF":
+            return (self.clf[0].threshold_-self.minim)/(self.maxim-self.minim)"""
     
     def _decision_function(self, X):
-        return self.clf[0].decision_function(X)
+        try:
+            return self.clf[0].decision_function(X)
+        except Exception:
+            return self.clf[0].predict_proba(X)[:,1]
 
 
 # -----------------------------------------------------------------------------------------
@@ -160,3 +188,27 @@ def exceed(train_scores, test_scores, prediction=np.array([]), contamination=0.1
     confidences = np.vstack((1.0 - exWise_conf, exWise_conf)).T
 
     return confidences
+
+class newAnomalyDetectorNorm():
+    def __init__(self) -> None:
+        pass
+
+    def fit(self, X, sample_weight = None):
+        pass
+
+    """def _threshold(self):
+        return self.threshold"""
+
+    def predict_proba(self, X):
+        probabs = np.power(np.linalg.norm(X, axis = 1),2)
+        probabs = probabs/np.max(probabs)
+        res = np.zeros((len(X),2))
+        res[:,1]=probabs
+        res[:,0]=1-probabs
+        """
+        idxs = np.flip(np.argsort(probabs))
+        self.cont_factor = .1
+        idx1 = int(np.floor(len(idxs)*self.cont_factor))
+        self.threshold = np.mean(probabs[idxs[idx1:idx1+1]])"""
+        return res
+    

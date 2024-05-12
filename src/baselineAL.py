@@ -12,6 +12,15 @@ from transfer_learning import get_transfer_classifier
 from rewardInfo import RewardInfo
 from data import Data
 
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
+
 # -----------------------------------------------------------------------------------------
 # Separate detector baseline
 # -----------------------------------------------------------------------------------------

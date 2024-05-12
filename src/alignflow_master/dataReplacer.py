@@ -22,6 +22,7 @@ class DataReplacer():
         for key in range(self.num_sources):
             self.data[key] = data[key].astype(np.float32)
             self.data[key] = np.hstack((self.data[key], np.zeros((len(self.data[key][:,0]),1),dtype = np.float32)))
+        return self
 
     def setData(self, data):
         for key in range(self.num_sources):

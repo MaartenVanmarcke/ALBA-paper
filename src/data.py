@@ -3,6 +3,14 @@
 import numpy as np
 from collections import OrderedDict
 
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 class Data:
 
@@ -52,6 +60,8 @@ class Data:
         self.n_ = np.array([self.get_domain_shape(key)[0] for key in self.keys_])
         self.N_ = np.sum(self.n_)
         self.m_ = self.get_domain_shape(key)[1]
+
+        return self
 
     def reset_domain(self, key, X):
         self.domains_[int(key)] = np.copy(X)

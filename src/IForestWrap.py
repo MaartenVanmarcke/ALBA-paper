@@ -1,5 +1,14 @@
 from pyod.models.iforest import IForest
- 
+import numpy as np
+
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 class IForestWrap(IForest):
     def __init__(self, 
@@ -16,4 +25,5 @@ class IForestWrap(IForest):
 
     def fit(self, X, sample_weight=None):
         super().fit(X)
-        IForest()
+
+    

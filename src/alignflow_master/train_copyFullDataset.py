@@ -6,11 +6,12 @@ If this script is run as main file, then the dataPlacer comes from the datA and 
 import sys
 import os
 import pathlib
-current = pathlib.Path().parent.absolute()
-sys.path.insert(1, os.path.join(current, "alignflow_master"))
+current = pathlib.Path().absolute()
+sys.path.insert(1, os.path.join(current, "src", "alignflow_master"))
 
 import models
-
+import csv
+from sklearn.metrics import roc_auc_score
 from args import TrainArgParser
 from dataset import PairedDataset, UnpairedDataset
 from evaluation import evaluate
@@ -20,6 +21,7 @@ from saver import ModelSaver
 from torch.utils.data import DataLoader
 from dataReplacer import DataReplacer
 from dataInput import datA, y_inst
+from pyod.models.iforest import IForest
 
 import torch
 import os
@@ -143,14 +145,21 @@ class Visualizer():
         plt.show()'''
         
 
-        fig, ax = plt.subplots( nrows=1, ncols=1, figsize = (15,9) )  # create figure & 1 axis
-
+        fig, ax = plt.subplots( nrows=1, ncols=1)#, figsize = (15,9) )  # create figure & 1 axis
+        prsnorm = np.zeros((0))
+        prsIF = np.zeros((0))
+        targets = np.zeros((0))
         plt.rcParams.update({'font.size': 18})
         for bag in y_inst.keys():
+            targets = np.concatenate((targets, y_inst[bag]))
             domain = D[bag]
             anomalies = []
             normals = []
             D[bag] = np.asarray(domain.tolist())
+            """prsnorm = np.concatenate((prsnorm,np.power(np.linalg.norm(D[bag], axis = 1),2)))
+            iforest = IForest(random_state=1302)
+            iforest.fit(D[bag])
+            prsIF = np.concatenate((prsIF,iforest.predict_proba(D[bag])[:,1]))"""
             s1 = []
             s2 = []
             for idx in range(len(domain)):
@@ -166,7 +175,6 @@ class Visualizer():
             s2 = np.asarray(s2)
             anomalies = np.asarray(anomalies)
             normals = np.asarray(normals)
-
             c=next(cycol)
             if (len(normals)>0):
                 ax.scatter(normals[:,0], normals[:,1], marker='.', c=c, s=250-200*s2, label = "Bag "+str(bag))#, c= 'b')
@@ -184,13 +192,36 @@ class Visualizer():
             self.xlim = (min(-3,self.xlim[0]),max(3,self.xlim[1]))
         ax.set_ylim(self.ylim )
         ax.set_xlim(self.xlim)"""
+        """prsnorm = prsnorm/np.max(prsnorm)
+        scorerocnorm = roc_auc_score(np.rint(targets), prsnorm)
+        prsIF = prsIF/np.max(prsIF)
+        scorerocIF = roc_auc_score(np.rint(targets), prsIF)"""
         if epoch == "result":
-            plt.title('Aligned 2D Toy Data Set')
+            plt.title('Aligned Moons Data Set')
+            
+            plt.xlabel("Feature 1")
+            plt.ylabel("Feature 2")
+            
+            plt.legend()
         else:
             plt.title('Aligned 2D Toy Data Set - Epoch '+str(epoch))
+        """textstr = "ROC AUC (NORM) = {:.10f}\nROC AUC (IF) = {:.10f}".format(scorerocnorm, scorerocIF)
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+        ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=14,
+            verticalalignment='top', horizontalalignment='right', bbox=props)"""
         #plt.legend()
         fig.savefig(os.path.join(args.current, 'img','epoch'+str(epoch)+'.png'),bbox_inches='tight')
         plt.close(fig)
+        """if epoch == 0:
+            self.ttt = textstr
+            self.tttnorm = scorerocnorm
+            self.tttIF = scorerocIF
+        if epoch == 200:
+            with open(os.path.join(args.current,'test.csv'), 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows([[args.features, self.tttnorm, self.tttIF, scorerocnorm, scorerocIF]])
+            print("EPOCH 0:",self.ttt)
+            print("EPOCH 200:",textstr)"""
 
     def makevideo(self):
         return
@@ -234,7 +265,7 @@ def train(args, dataReplacer: DataReplacer, y_inst):
 
 
     # Get loader, logger, and saver
-    train_loader, val_loader = get_data_loaders(args, dataReplacer.getData())
+    train_loader, _ = get_data_loaders(args, dataReplacer.getData())
     logger = TrainLogger(args, model, dataset_len=len(train_loader.dataset))
     saver = ModelSaver(args.save_dir, args.max_ckpts, metric_name=args.metric_name,
                        maximize_metric=args.maximize_metric, keep_topk=True)
@@ -299,7 +330,7 @@ def get_data_loaders(args,data):
                               shuffle=True,
                               num_workers=args.num_workers)
 
-    val_dataset = PairedDataset(args.data_dir,
+    """val_dataset = PairedDataset(args.data_dir,
                                 phase='val',
                                 resize_shape=args.resize_shape,
                                 crop_shape=args.crop_shape,
@@ -308,12 +339,12 @@ def get_data_loaders(args,data):
                             args.batch_size,
                             shuffle=False,
                             num_workers=args.num_workers,
-                            drop_last=True)
+                            drop_last=True)"""
 
-    return train_loader, val_loader
+    return train_loader, None#val_loader
 
 
-def main(dataReplacer:DataReplacer, y_inst, load: bool = False):
+def main(n_features: int, dataReplacer:DataReplacer, y_inst, load: bool = False):
     current = pathlib.Path(__file__).parent.resolve()
     parser = TrainArgParser()
     parser.model = "Flow2Flow"
@@ -369,9 +400,9 @@ def main(dataReplacer:DataReplacer, y_inst, load: bool = False):
     parser.modelload = load
     parser.name = "normalaligner"
     parser.num_epochs = 200#300
-    parser.features = 2
+    parser.features = n_features
     parser.model = "Flow2Flow"
-    parser.batch_size = 30# 30#16
+    parser.batch_size = 60# 30#16
     parser.iters_per_print= parser.batch_size
     parser.lr =.005#.005# 2e-4
     parser.rnvp_lr =.005#.005# 2e-4
@@ -412,23 +443,133 @@ def main(dataReplacer:DataReplacer, y_inst, load: bool = False):
     
     model = models.__dict__[parser.model](parser)
     model = ModelSaver.load_model(model, os.path.join(parser.save_dir, "best.pth.tar"), parser.gpu_ids, is_training=True)
-    #model.train()
+    model.train()
     Visualizer().visualize(model, dataReplacer, res, "result", True, args = parser)
 
 
 if __name__ == '__main__':
-    np.random.seed(1302)
+    
+    import os
+    import pathlib
+    from sklearn import datasets
+    current = pathlib.Path().parent.absolute().parent.absolute()
+    p =  os.path.join(current,"ALBA-paper", "src", "seed.txt")
+    file = open(p)
+    seed = int(file.read())
+    file.close()
+    np.random.seed(seed)
 
-    ff = np.zeros((90,2))
-    for i in range(len(ff)):
-            ff[i,:] = np.random.uniform(-1,1,size = ((1,2)))
-            while ff[i,1]>-.3 and abs(ff[i,0]) < .5:
-                ff[i,:] = np.random.uniform(-1,1,size = ((1,2)))
+    """poiints, yy = datasets.make_moons(60, noise = 0.1, random_state = 1302)
+    bag1 = []
+    bag2= []
+    for i in range(len(yy)):
+        if yy[i]>0:
+            bag2.append(poiints[i,:])
+        else:
+            bag1.append(poiints[i,:])
+            
+    dd = np.hstack((np.random.uniform(-2,-1.25,size=((100,1))), np.random.uniform(-1.5,0.5, size = ((100,1)))))
+
+    for bag in [bag1, bag2]:
+        for i in range(5):
+            bag.append([np.random.uniform(-1,2), np.random.uniform(-.5,1)])
+    """
+    n_dim = 2
+    bag1 = np.random.normal(0,1,size = (30,n_dim))
+    bag2 = np.random.normal(.75,1,size = (30,n_dim))
+    
+    bag1 = np.concatenate((bag1, np.random.uniform(-2,2,size=((5,n_dim)))))
+    bag2 = np.concatenate((bag2, np.random.uniform(-1.25,2.75,size=((5,n_dim)))))
+
+    """from sklearn.preprocessing import StandardScaler
+    
+    scaler = StandardScaler()
+    bag1 = scaler.fit_transform(bag1)
+    bag2 = scaler.fit_transform(bag2)"""
+
+    ## TODO: delete this
+    datA = {0: np.asarray(bag1),  1: np.asarray(bag2)}
+    y_inst = {0: np.concatenate((np.zeros((30)),np.ones((5)))), 1: np.concatenate((np.zeros((30)),np.ones((5))))}
+    #weights = {0: np.zeros((35)), 1: np.zeros((35))}
+    weights = {0: np.concatenate((0.4*np.ones((30)),.6*np.ones((5)))), 1: np.concatenate((0.4*np.ones((30)),.6*np.ones((5))))}
+
+    dataReplacer = DataReplacer(num_sources=len(datA))
+    dataReplacer.setInitData(datA)
+
+
+    ## TODO delete this
+    dataReplacer.setWeights(weights)
+
+    main(n_dim, dataReplacer, y_inst, load = False)
+
+
+    D = datA
+    fig, ax = plt.subplots( nrows=1, ncols=1)#, figsize = (15,9) )  # create figure & 1 axis
+    clrs = ['b','g','r','c','m','k','y', 'lime','deeppink','aqua','yellow','gray','darkorange','saddlebrown','salmon']
+    from itertools import cycle
+    cycol = cycle(clrs)
+    w = weights
+    
+    tick_font_size = 18
+    plt.rcParams.update({'font.size': 18})
+
+    for bag in y_inst.keys():
+        domain = D[bag]
+        anomalies = []
+        normals = []
+        D[bag] = np.asarray(domain.tolist())
+        s1 = []
+        s2 = []
+        for idx in range(len(domain)):
+            if y_inst[bag][idx] == 1:
+                anomalies.append(domain[idx])
+                s1.append(w[bag][idx])
+
+            else:
+                normals.append(domain[idx])
+                s2.append(w[bag][idx])
+
+        s1 = np.asarray(s1)
+        s2 = np.asarray(s2)
+        anomalies = np.asarray(anomalies)
+        normals = np.asarray(normals)
+
+        c=next(cycol)
+        if (len(normals)>0):
+            print(bag)
+            ax.scatter(normals[:,0], normals[:,1], marker='.', c=c, s=250-200*s2, label = "Bag "+str(bag))#, c= 'b')
+        if (len(anomalies)>0):
+            ax.scatter(anomalies[:,0], anomalies[:,1],  marker='+', c=c, s=250-200*s1, label = "Anomalies bag"+str(bag))#,c= 'b')   
+        
+        plt.title('Moons Data Set')
+        plt.xlabel("Feature 1")
+        plt.ylabel("Feature 2")
+        ax.legend()
+        fig.savefig(os.path.join(pathlib.Path(__file__).parent.resolve(), 'img','originalSimple.png'),bbox_inches='tight')
+        plt.close(fig)
+
+
+    """
+    
+    import os
+    import pathlib
+    current = pathlib.Path().parent.absolute().parent.absolute()
+    p =  os.path.join(current, "seed.txt")
+    file = open(p)
+    seed = int(file.read())
+    file.close()
+    np.random.seed(seed)
+
+    nnormals = np.zeros((90,2))
+    for i in range(len(nnormals)):
+            nnormals[i,:] = np.random.uniform(-1,1,size = ((1,2)))
+            while nnormals[i,1]>-.3 and abs(nnormals[i,0]) < .5:
+                nnormals[i,:] = np.random.uniform(-1,1,size = ((1,2)))
 
     dd = np.hstack((np.random.uniform(-2,-1.25,size=((100,1))), np.random.uniform(-1.5,0.5, size = ((100,1)))))
 
     ## TODO: delete this
-    datA = {0: np.concatenate((ff, np.hstack((np.random.uniform(-.25,.25,size=((10,1))), np.random.uniform(0,1,size = ((10,1))))))), 1: dd}
+    datA = {0: np.concatenate((nnormals, np.hstack((np.random.uniform(-.25,.25,size=((10,1))), np.random.uniform(0,1,size = ((10,1))))))), 1: dd}
     y_inst = {0: np.concatenate((np.zeros((90)), np.ones((10)))), 1: np.zeros((100))}
     weights = {0: np.concatenate((np.zeros((90)), 0.9*np.ones((10)))), 1: np.zeros((100))}
 
@@ -482,6 +623,6 @@ if __name__ == '__main__':
         
         plt.title('Generated 2D Toy Data Set')
         fig.savefig(os.path.join(pathlib.Path(__file__).parent.resolve(), 'img','originalSimple.png'),bbox_inches='tight')
-        plt.close(fig)
+        plt.close(fig)"""
 
         

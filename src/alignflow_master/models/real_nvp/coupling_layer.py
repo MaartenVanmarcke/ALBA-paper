@@ -22,7 +22,7 @@ class CouplingLayer(nn.Module):
         mask_type (MaskType): One of `MaskType.CHECKERBOARD` or `MaskType.CHANNEL_WISE`.
         reverse_mask (bool): Whether to reverse the mask. Useful for alternating masks.
     """
-    def __init__(self, mask_type, reverse_mask):
+    def __init__(self, n_features, mask_type, reverse_mask):
         super(CouplingLayer, self).__init__()
 
         # Save mask info
@@ -30,7 +30,7 @@ class CouplingLayer(nn.Module):
         self.reverse_mask = reverse_mask
 
         # Build scale and translate network
-        self.st_net = NewNet()
+        self.st_net = NewNet(n_features)
 
         # Learnable scale and shift for s
         self.s_scale = nn.Parameter(torch.ones(1))
@@ -105,11 +105,22 @@ class CouplingLayer(nn.Module):
 
 
 class NewNet(nn.Module):
-    def __init__(self):
+    def __init__(self, n_features):
         super().__init__()
-        self.fc1 = nn.Linear(2,20)
-        self.fc5 = nn.Linear(20,2)
-        self.fc6 = nn.Linear(2,2)
+        self.fc1 = nn.Linear(n_features,10*n_features)
+        self.fc5 = nn.Linear(10*n_features,n_features)
+        self.fc6 = nn.Linear(n_features,2)
+        self._init_weights(self.fc1)
+        self._init_weights(self.fc5)
+        self._init_weights(self.fc6)
+
+
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            module.weight.data.zero_()
+            if module.bias is not None:
+                module.bias.data.zero_()
+
 
     def forward(self, x):
         x = nn.functional.relu(self.fc1(x))

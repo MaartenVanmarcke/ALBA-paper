@@ -7,7 +7,16 @@ from itertools import chain
 from models.patch_gan import PatchGAN
 from models.real_nvp import RealNVP, RealNVPLoss
 
-torch.manual_seed(1302)
+
+    
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src","seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+torch.manual_seed(seed)
 
 class Flow2Flow(nn.Module):
     """Flow2Flow Model
@@ -31,7 +40,7 @@ class Flow2Flow(nn.Module):
 
 
         # Set up RealNVP generators (g_src: X <-> Z, g_tgt: Y <-> Z)
-        self.g_src = nn.ModuleList([RealNVP(un_normalize_x=True, no_latent=False) for _ in range(self.num_sources)])
+        self.g_src = nn.ModuleList([RealNVP(args.features, un_normalize_x=True, no_latent=False) for _ in range(self.num_sources)])
         for model in self.g_src:
             util.init_model(model, init_method=args.initializer)
 
@@ -44,7 +53,7 @@ class Flow2Flow(nn.Module):
             # Set up loss functions
             self.max_grad_norm = args.clip_gradient
             self.lambda_mle = args.lambda_mle
-            self.mle_loss_fn = RealNVPLoss()
+            self.mle_loss_fn = RealNVPLoss(n_features=args.features)
             self.gan_loss_fn = util.GANLoss(device=self.device, use_least_squares=True)
 
             self.clamp_jacobian = args.clamp_jacobian

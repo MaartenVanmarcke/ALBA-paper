@@ -15,6 +15,14 @@ import config as cfg
 from classifier import Classifier
 from ReliableMSTL.KernelUtil import kernel_mean_matching, mmd
 
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 def get_transfer_classifier(transfer_function, modus, transfer_settings={}):
     if len(transfer_settings) == 0:
@@ -51,7 +59,7 @@ class NoTransferClassifier:
     def apply_transfer(self, data=None):
         pass
 
-    def fit_all(self, data, ignore_unchanged=False):
+    def fit_all(self, data,probs, ignore_unchanged=False):
         '''for key in data.keys_:
             y = data.get_domain_labels(key)
             nl = np.count_nonzero(y)
@@ -62,7 +70,8 @@ class NoTransferClassifier:
                 self.classifiers[key] = clf
             data.set_processed_label_count(key, nl)'''
         y = np.zeros((0))
-        X = np.zeros((0,2))
+        n_features = data.get_domain(0).shape[1]
+        X = np.zeros((0,n_features))
         noChange = True
         for key in data.keys_:
             y = np.concatenate((y,data.get_domain_labels(key)))
@@ -74,13 +83,13 @@ class NoTransferClassifier:
         # Train whole new classifier? Or old classifier with one training instance?
         if (noChange == False):
             clf = Classifier(modus=self.modus)
-            clf.fit(X, y)
+            clf.fit(X, y,prior= probs)
             self.classifier = clf
 
-    def predict(self, train_key, X, probabilities=False):
+    def predict(self, train_key, X, probs, probabilities=False):
         if probabilities:
             scores = self.classifier.predict_proba(X)
-            probabs = scores/self.classifier._threshold()
+            probabs = scores/self.classifier._threshold(prior = probs)
             xx = 1-np.power(2, -probabs)
             return xx
         else:
@@ -116,7 +125,7 @@ class LocitTransferClassifier:
             data.set_transfer_weights(key, key, np.ones(len(Xt), dtype=float))
         self.transfer_done_ = True
 
-    def fit_all(self, data, ignore_unchanged=False):
+    def fit_all(self, data,probs, ignore_unchanged=False):
         if not(self.transfer_done_):
             self.apply_transfer(data)
         for key in data.keys_:
@@ -169,7 +178,7 @@ class CoralTransferClassifier:
             data.set_transfer_weights(key, key, np.ones(len(Xt), dtype=float))
         self.transfer_done_ = True
 
-    def fit_all(self, data, ignore_unchanged=False):
+    def fit_all(self, data, probs,ignore_unchanged=False):
         if not(self.transfer_done_):
             self.apply_transfer(data)
         for key in data.keys_:
@@ -221,7 +230,7 @@ class PwmstlTransferClassifier:
             # TODO: check the correct MMD score when domains are equal (equal = no discrepancy?)
             data.proximity_matrix_[d_key][key] = 0.0
 
-    def fit_all(self, data):
+    def fit_all(self, data, probs):
         # recompute the R matrix
         # compute omega
         pass

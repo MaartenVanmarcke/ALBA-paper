@@ -15,6 +15,14 @@ import config as cfg
 from classifier import Classifier
 from ReliableMSTL.KernelUtil import kernel_mean_matching, mmd
 
+import os
+import pathlib
+current = pathlib.Path().parent.absolute()
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 def get_transfer_classifier(transfer_function, modus, transfer_settings={}, cont_factor = None):
     print(str(transfer_function))
@@ -53,29 +61,29 @@ class NoTransferClassifier:
     def apply_transfer(self, data=None):
         pass
 
-    def fit_all(self, data, ignore_unchanged=False):
+    def fit_all(self, data, probs, ignore_unchanged=False):
         for key in data.keys_:
             y = data.get_domain_labels(key)
             nl = np.count_nonzero(y)
             if not(ignore_unchanged) or (nl > data.get_processed_label_count(key)):
                 X = data.get_domain(key)
                 clf = Classifier(modus=self.modus)
-                clf.fit(X, y)
+                clf.fit(X, y, prior = probs)
                 self.classifiers[key] = clf
             data.set_processed_label_count(key, nl)
 
-    def _predict(self, train_key, X, probabilities=False):
+    def _predict(self, train_key, X, probs, probabilities=False):
         if probabilities:            
             return self.classifiers[train_key]._decision_function(X)
         else:
             return self.classifiers[train_key].predict(X)
 
         
-    def predict(self, test_data, probabilities=True):
+    def predict(self, test_data, probabilities=True, prior = None):
         predictions = OrderedDict({})
         for key in test_data.keys_:
             X = test_data.get_domain(key)
-            predictions[key] = self._predict(key, X, probabilities)
+            predictions[key] = self._predict(key, X, prior, probabilities)
 
 
         return predictions

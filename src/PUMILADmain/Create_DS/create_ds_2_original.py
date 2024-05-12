@@ -8,6 +8,21 @@ def gen_data(k, nbags, bag_contfactor = 0.1, seed = 331):
                  9:([5,-5], [1.5,0.5]), 10:([-5,5], [0.5,1])}
     anom_clusters = {11:([7,10],[2,2]), 12:([-3,-4],[1.5,1.5]), 13:([-10,12],[1.5,1.5]),
                      14:([-14,4],[.25,3])}
+    '''i = 1
+    norm_copy = norm_clusters.copy()
+    norm_clusters = {}
+    for key in norm_copy.keys():
+        norm_clusters[i] = norm_copy[key]
+        i += 1
+
+    anom_copy = anom_clusters.copy()
+    anom_clusters= {}
+    for key in anom_copy.keys():
+        anom_clusters[i] = anom_copy[key]
+        i += 1
+
+    print(norm_clusters)
+    print(anom_clusters)'''
     
     n_norm_clusters = len(norm_clusters.keys())
     n_anom_clusters = len(anom_clusters.keys())
@@ -15,7 +30,7 @@ def gen_data(k, nbags, bag_contfactor = 0.1, seed = 331):
     
     bags_labels = np.zeros(nbags, int)
     bags = {}
-    X_inst = np.empty(shape = (0,2))
+    X_inst = np.empty(shape = (0,3))
     y_inst = np.array([])
     
     for b in range(nbags):
@@ -45,6 +60,14 @@ def gen_data(k, nbags, bag_contfactor = 0.1, seed = 331):
                 w = w/sum(w)
                 w = np.around(w*k).astype(int)
                 w[np.random.choice(np.where(w>=sum(w)-k)[0],1)]+=k-sum(w)
+            '''for i in range(1,n_anom_clusters+1):
+                dummy = w[-i]
+                z = np.round(dummy/3)
+                if (z!= 0):
+                    s = np.random.randint(0,z)
+                    randomanoms += s
+                    w[-i] = w[-i]-s
+            w = np.concatenate((w, [randomanoms]))'''
             X,y = gen_anomalies(norm_clusters, anom_clusters, w)
             bags_labels[b] = 1
         bags[b] = X.T
@@ -65,8 +88,8 @@ def gen_normals(norm_clusters, w):
         
         X1 = np.concatenate((X1,np.random.normal(loc=X1_mean, scale=X1_var, size=w[key-1])))
         X2 = np.concatenate((X2,np.random.normal(loc=X2_mean, scale=X2_var, size=w[key-1])))
-
-    X = np.array([X1,X2]).reshape(2,-1)
+    X3 = np.random.normal(loc = 0, scale=1, size = sum(w))
+    X = np.array([X1,X2, X3]).reshape(3,-1)
     y = np.zeros(sum(w), int)
     return X,y
 
@@ -85,9 +108,11 @@ def gen_anomalies(norm_clusters, anom_clusters, w):
         
         X1 = np.concatenate((X1,np.random.normal(loc=X1_mean, scale=X1_var, size=w[key-1])))
         X2 = np.concatenate((X2,np.random.normal(loc=X2_mean, scale=X2_var, size=w[key-1])))
+    X3 = np.random.normal(loc = 0, scale=1, size = sum(w))
     nnormals = sum(w[:-len(anom_clusters.keys())])
     nanom = sum(w[-len(anom_clusters.keys()):])
     y = np.zeros(nnormals+nanom, int)
     y[-nanom:] = 1
-    X = np.array([X1,X2]).reshape(2,-1)
+    y[np.random.choice(len(y)-nanom, size = int(nanom/2), replace=False)] = 1
+    X = np.array([X1,X2, X3]).reshape(3,-1)
     return X,y
