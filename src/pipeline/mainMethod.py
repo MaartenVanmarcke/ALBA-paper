@@ -229,7 +229,7 @@ class MainMethod():
                             print("No model found to remove")
 
                     # Align the instances
-                    aligner = main(n_features, dataReplacer, y_inst, load)
+                    aligner = main(n_features, dataReplacer, y_inst, dataname + "."+ self.versionname, load)
 
                     # Get the aligned data
                     alignedData = dataReplacer.getLatent()

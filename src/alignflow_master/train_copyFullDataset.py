@@ -79,9 +79,9 @@ class Visualizer():
     def visualize(self, model, data,y_inst, epoch, isNewEpoch: bool = False, args = None):
         dataReplacer = data
         data = dataReplacer.getData()
-        clrs = ['b','g','r','c','m','k','y', 'lime','deeppink','aqua','yellow','gray','darkorange','saddlebrown','salmon']
+        """clrs = ['b','g','r','c','m','k','y', 'lime','deeppink','aqua','yellow','gray','darkorange','saddlebrown','salmon']
         from itertools import cycle
-        cycol = cycle(clrs)
+        cycol = cycle(clrs)"""
         
         '''fig, ax = plt.subplots(2,3)
         ax[0,0].scatter(a_data[:,0], a_data[:,1])
@@ -99,11 +99,11 @@ class Visualizer():
             lats, transfs = model.test()
             #newb = transfs[0][1].numpy()
             D = {}
-            w = {}
+            #w = {}
             i = 0
             for lat in lats:
                 D[i] = lat.numpy()
-                w[i] = data[i][:,-1]
+                #w[i] = data[i][:,-1]
                 i += 1
             if isNewEpoch:
                 dataReplacer.setLatent(D)
@@ -145,7 +145,7 @@ class Visualizer():
         plt.show()'''
         
 
-        fig, ax = plt.subplots( nrows=1, ncols=1)#, figsize = (15,9) )  # create figure & 1 axis
+        """fig, ax = plt.subplots( nrows=1, ncols=1)#, figsize = (15,9) )  # create figure & 1 axis
         prsnorm = np.zeros((0))
         prsIF = np.zeros((0))
         targets = np.zeros((0))
@@ -155,12 +155,12 @@ class Visualizer():
             domain = D[bag]
             anomalies = []
             normals = []
-            D[bag] = np.asarray(domain.tolist())
-            """prsnorm = np.concatenate((prsnorm,np.power(np.linalg.norm(D[bag], axis = 1),2)))
+            D[bag] = np.asarray(domain.tolist())"""
+        """prsnorm = np.concatenate((prsnorm,np.power(np.linalg.norm(D[bag], axis = 1),2)))
             iforest = IForest(random_state=1302)
             iforest.fit(D[bag])
             prsIF = np.concatenate((prsIF,iforest.predict_proba(D[bag])[:,1]))"""
-            s1 = []
+        """s1 = []
             s2 = []
             for idx in range(len(domain)):
                 if y_inst[bag][idx] == 1:
@@ -179,7 +179,7 @@ class Visualizer():
             if (len(normals)>0):
                 ax.scatter(normals[:,0], normals[:,1], marker='.', c=c, s=250-200*s2, label = "Bag "+str(bag))#, c= 'b')
             if (len(anomalies)>0):
-                ax.scatter(anomalies[:,0], anomalies[:,1],  marker='+', c=c, s=250-200*s1, label = "Anomalies bag "+str(bag))#,c= 'b')   
+                ax.scatter(anomalies[:,0], anomalies[:,1],  marker='+', c=c, s=250-200*s1, label = "Anomalies bag "+str(bag))#,c= 'b')  """ 
 
         '''for bag in range(len(bags)):
             domain = bags[bag]
@@ -196,7 +196,7 @@ class Visualizer():
         scorerocnorm = roc_auc_score(np.rint(targets), prsnorm)
         prsIF = prsIF/np.max(prsIF)
         scorerocIF = roc_auc_score(np.rint(targets), prsIF)"""
-        if epoch == "result":
+        """if epoch == "result":
             plt.title('Aligned Moons Data Set')
             
             plt.xlabel("Feature 1")
@@ -204,14 +204,14 @@ class Visualizer():
             
             plt.legend()
         else:
-            plt.title('Aligned 2D Toy Data Set - Epoch '+str(epoch))
+            plt.title('Aligned 2D Toy Data Set - Epoch '+str(epoch))"""
         """textstr = "ROC AUC (NORM) = {:.10f}\nROC AUC (IF) = {:.10f}".format(scorerocnorm, scorerocIF)
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
         ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=14,
             verticalalignment='top', horizontalalignment='right', bbox=props)"""
         #plt.legend()
-        fig.savefig(os.path.join(args.current, 'img','epoch'+str(epoch)+'.png'),bbox_inches='tight')
-        plt.close(fig)
+        """fig.savefig(os.path.join(args.current, 'img','epoch'+str(epoch)+'.png'),bbox_inches='tight')
+        plt.close(fig)"""
         """if epoch == 0:
             self.ttt = textstr
             self.tttnorm = scorerocnorm
@@ -265,11 +265,12 @@ def train(args, dataReplacer: DataReplacer, y_inst):
 
 
     # Get loader, logger, and saver
-    train_loader, _ = get_data_loaders(args, dataReplacer.getData())
-    logger = TrainLogger(args, model, dataset_len=len(train_loader.dataset))
+    #train_loader, _ = get_data_loaders(args, dataReplacer.getData())
+    thedata = dataReplacer.getData().copy()
+
+    logger = TrainLogger(args, model, dataset_len=len(thedata))
     saver = ModelSaver(args.save_dir, args.max_ckpts, metric_name=args.metric_name,
                        maximize_metric=args.maximize_metric, keep_topk=True)
-    
     vis = Visualizer()
     #vis.visualize(None, datA, y_inst, 0)
     vis.visualize(model, dataReplacer, y_inst, 0, True, args = args)
@@ -279,19 +280,16 @@ def train(args, dataReplacer: DataReplacer, y_inst):
     import time
     xxx  =time.time()
     print("START", xxx)
+    for k,v in thedata.items():
+        thedata[k] = torch.Tensor(v)
+    thedata = [thedata]
 
     summm = 0
-    thedata = None
     # Train
     while not logger.is_finished_training():
         logger.start_epoch()
-        if thedata == None:
-            thedata = []
-            for batch in train_loader:
-                thedata.append(batch)
         for batch in thedata:
             logger.start_iter()
-
             # Train over one batch
             model.set_inputs([batch[i][:,:-1] for i in range(args.num_sources)], [batch[i][:,-1] for i in range(args.num_sources)])
             model.train_iter()
@@ -321,14 +319,14 @@ def train(args, dataReplacer: DataReplacer, y_inst):
 
 
 def get_data_loaders(args,data):
-    train_dataset = UnpairedDataset(data,#args.data_dir,
+    """train_dataset = UnpairedDataset(data,#args.data_dir,
                                     phase='train',
-                                    shuffle_pairs=True,
+                                    shuffle_pairs=False,
                                     direction=args.direction)
     train_loader = DataLoader(train_dataset,
                               args.batch_size,
-                              shuffle=True,
-                              num_workers=args.num_workers)
+                              shuffle=False,
+                              num_workers=args.num_workers)"""
 
     """val_dataset = PairedDataset(args.data_dir,
                                 phase='val',
@@ -340,11 +338,12 @@ def get_data_loaders(args,data):
                             shuffle=False,
                             num_workers=args.num_workers,
                             drop_last=True)"""
+    return None, None
 
-    return train_loader, None#val_loader
+    #return train_loader, None#val_loader
 
 
-def main(n_features: int, dataReplacer:DataReplacer, y_inst, load: bool = False):
+def main(n_features: int, dataReplacer:DataReplacer, y_inst, Uniquename, load: bool = False):
     current = pathlib.Path(__file__).parent.resolve()
     parser = TrainArgParser()
     parser.model = "Flow2Flow"
@@ -408,8 +407,7 @@ def main(n_features: int, dataReplacer:DataReplacer, y_inst, load: bool = False)
     parser.rnvp_lr =.005#.005# 2e-4
     parser.lambda_mle = 1. # 1e-4
     parser.epochs_per_print = 5
-
-
+    parser.name = Uniquename
     # Set up available GPUs
     if len(parser.gpu_ids) > 0:
         # Set default GPU for `tensor.to('cuda')`
@@ -500,7 +498,7 @@ if __name__ == '__main__':
     ## TODO delete this
     dataReplacer.setWeights(weights)
 
-    main(n_dim, dataReplacer, y_inst, load = False)
+    main(n_dim, dataReplacer, y_inst, Uniquename= "normalaligner", load = False)
 
 
     D = datA

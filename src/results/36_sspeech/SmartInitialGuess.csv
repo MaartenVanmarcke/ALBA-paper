@@ -1,0 +1,10 @@
+auc_roc,0.2884041836748718
+auc_pr,0.050654982000466295
+auc_roc_bag,0.2777777777777778
+auc_pr_bag,0.19201903492136746
+Date,2024-05-13
+Time,48.962934732437134
+n_clusters,50
+instance_per_bag,40
+n_bags,25
+bag_contfactor,0.3

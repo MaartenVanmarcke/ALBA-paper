@@ -6,6 +6,7 @@ from enum import IntEnum
 from models.real_nvp.st_resnet import STResNet
 from util import checkerboard_like
 
+import math
 
 class MaskType(IntEnum):
     CHECKERBOARD = 0
@@ -107,9 +108,9 @@ class CouplingLayer(nn.Module):
 class NewNet(nn.Module):
     def __init__(self, n_features):
         super().__init__()
-        self.fc1 = nn.Linear(n_features,10*n_features)
-        self.fc5 = nn.Linear(10*n_features,n_features)
-        self.fc6 = nn.Linear(n_features,2)
+        self.fc1 = nn.Linear(n_features,20*math.ceil(math.log2(n_features)))
+        self.fc5 = nn.Linear(20*math.ceil(math.log2(n_features)),2*math.ceil(math.log2(n_features)))
+        self.fc6 = nn.Linear(2*math.ceil(math.log2(n_features)),2)
         self._init_weights(self.fc1)
         self._init_weights(self.fc5)
         self._init_weights(self.fc6)

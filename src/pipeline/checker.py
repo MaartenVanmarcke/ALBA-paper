@@ -63,7 +63,7 @@ class Checker:
                     prs = np.concatenate((prs, np.array([1])))
                     dummy = np.concatenate((labels[bag2], np.array([1])))
                     score = roc_auc_score(np.rint(dummy), prs)
-                    if abs(score-scoreOrig)>=.1:
+                    if abs(score-scoreOrig)>=.2:
                         flag = True
                         break
                 if flag: 
