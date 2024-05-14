@@ -1,16 +1,12 @@
 """ Classifier class + classification functionality. """
 
 import numpy as np
-import pandas as pd
 
 from scipy.stats import binom
 from functools import partial
-from collections import OrderedDict
 from sklearn.metrics import pairwise_distances
-from sklearn.ensemble import IsolationForest
 from sklearn.svm import SVC
 from anomatools.models import SSDO
-from pyod.models.iforest import IForest
 from IForestWrap import IForestWrap
 
 import os
