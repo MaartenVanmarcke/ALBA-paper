@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from enum import IntEnum
-from models.real_nvp.st_resnet import STResNet
 from util import checkerboard_like
 
 import math
