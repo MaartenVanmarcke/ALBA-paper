@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 from util import init_model, get_norm_layer
-
+import math
 
 class PatchGAN(nn.Module):
     """PatchGAN discriminator."""
@@ -22,13 +22,13 @@ class PatchGAN(nn.Module):
 
         # Double channels for conditional GAN (concatenated src and tgt images)
 
-        layers += [nn.Linear(args.features,3),
+        layers += [nn.Linear(args.features,3*math.ceil(math.log2(args.features))),
                    nn.LeakyReLU(0.2, True)]
 
-        layers += [nn.Linear(3,2),
+        layers += [nn.Linear(3*math.ceil(math.log2(args.features)),2*math.ceil(math.log2(args.features))),
                    nn.LeakyReLU(0.2, True)]
 
-        layers += [nn.Linear(2,2),
+        layers += [nn.Linear(2*math.ceil(math.log2(args.features)),2),
                    nn.LeakyReLU(0.2, True)]
 
         self.model = nn.Sequential(*layers)

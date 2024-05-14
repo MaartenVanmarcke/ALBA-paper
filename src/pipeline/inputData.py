@@ -84,7 +84,29 @@ class Annthyroid_2(InputData):
         super().__init__(name)
 
     def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','2_annthyroid.npz'), allow_pickle=True)
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','13_fraud.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+    
+class nbr4(InputData):
+    
+    def __init__(self) -> None:
+        name = "nbr4"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','19_landsat.npz'), allow_pickle=True)
         data, labels = data['X'], data['y']
         idxs = labels == 0
         self.normals = data[idxs, :]

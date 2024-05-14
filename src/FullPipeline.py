@@ -45,13 +45,13 @@ class FullPipeline:
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                 _ = checker(bags, bags_labels, X_inst, y_inst)
                 query_budget = 248#int(.25*len(y_inst))
-                query_budget = 1
+                query_budget = 100
                 for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
                     end = time.time()
                     self.savetime(inputData.getName() + "."+ method.name, i, end-start)
-                    saver(rewardInfo, current, inputData.getName(), method.name, end-start, parameters= None)
+                    saver(rewardInfo, current, inputData.getName(), method.name+"."+str(i), end-start, parameters= None)
         plotPerformance()
         print("Pipeline finished without noticeable errors. :D")
         return None
@@ -79,7 +79,7 @@ if __name__=="__main__":
     inputDatas = [Speech_36()]#[TestData()]
     nclusters = 50
     instance_per_bag = 40
-    nbags = 25
+    nbags = 10
     bag_contfactor = .3
     constructBags = ConstructBags(nclusters,nbags, instance_per_bag,bag_contfactor)
     preprocessor = Preprocessor()
@@ -96,7 +96,7 @@ if __name__=="__main__":
     preprocessor = Preprocessor()
     query_budget = int(.25*2)
     query_budget = 5"""
-    methods = [SmartInitialGuessMethod()]#, AlbaMethod(), WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
+    methods = [SmartInitialGuessMethod(), AlbaMethod(), WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
     pipeline = FullPipeline()
     plotPerformance = PlotPerformance()
     pipeline(inputDatas, constructBags, preprocessor, methods, plotPerformance, checker, saver)
