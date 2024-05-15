@@ -40,9 +40,9 @@ class FullPipeline:
             seedcounter = 0
             query_budget = 3
             for i in range(2):
-                file = open(p, mode = "w")
+                """file = open(p, mode = "w")
                 file.write(str(i))
-                file.close()    
+                file.close()    """
                 bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies, i)
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                 flag = checker(bags, bags_labels, X_inst, y_inst)
