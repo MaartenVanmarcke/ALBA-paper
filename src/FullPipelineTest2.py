@@ -1,6 +1,6 @@
 from typing import Any
 from pipeline.constructBags import ConstructBags
-from pipeline.inputData import InputData, TestData, Speech_36
+from pipeline.inputData import InputData, TestData, Speech_36, Annthyroid_2
 from pipeline.methods import WithAlignmentMethod, WithoutAlignmentMethod, Method, ActiveLearning, RandomSampling, SmartInitialGuessMethod, AlbaMethod
 from pipeline.preprocessor import Preprocessor
 from pipeline.plotPerformance import PlotPerformance
@@ -76,7 +76,7 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [Speech_36()]#[TestData()]
+    inputDatas = [Annthyroid_2()]#[TestData()]
     nclusters = 50
     instance_per_bag = 50
     nbags = 10

@@ -11,6 +11,7 @@ np.random.seed(seed)
 class InputData:
     def __init__(self, name) -> None:
         self.name = name
+        print("DATASET:", name)
         self.loadData()
 
     def getName(self):
