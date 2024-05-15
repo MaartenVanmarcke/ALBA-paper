@@ -49,7 +49,7 @@ class TrainLogger(BaseLogger):
                     k = 'd/' + k
                 else:
                     k = 'g/' + k
-                self.summary_writer.add_scalar(k, v, self.global_step)
+                #self.summary_writer.add_scalar(k, v, self.global_step)
 
             if (self.epoch) % self.epochs_per_print == 0 or self.epoch == 1:
                 self.write(message)
@@ -72,7 +72,7 @@ class TrainLogger(BaseLogger):
         # Update the learning rate according to the LR schedulers
         self.model.on_epoch_end()
         learning_rate = self.model.get_learning_rate()
-        self.summary_writer.add_scalar('hpm/lr', learning_rate, self.global_step)
+        #self.summary_writer.add_scalar('hpm/lr', learning_rate, self.global_step)
 
         self.epoch += 1
 
