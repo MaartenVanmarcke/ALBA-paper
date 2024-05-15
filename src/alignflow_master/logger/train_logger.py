@@ -1,5 +1,3 @@
-import util
-
 from time import time
 from logger.base_logger import BaseLogger
 
