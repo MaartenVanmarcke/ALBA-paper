@@ -54,7 +54,7 @@ class FullPipeline:
                     bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                     flag = checker(bags, bags_labels, X_inst, y_inst)
                 query_budget = 248#int(.25*len(y_inst))
-                query_budget = 3
+                query_budget = 20
                 for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
