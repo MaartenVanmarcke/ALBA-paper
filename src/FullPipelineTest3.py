@@ -37,7 +37,7 @@ class FullPipeline:
         for inputData in inputDatas:
             normals = inputData.getNormals()
             anomalies = inputData.getNormals()
-            for i in range(2):
+            for i in range(1):
                 file = open(p, mode = "w")
                 file.write(str(i))
                 file.close()    
@@ -54,7 +54,7 @@ class FullPipeline:
                     bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                     flag = checker(bags, bags_labels, X_inst, y_inst)
                 query_budget = 248#int(.25*len(y_inst))
-                query_budget = 2
+                query_budget = 1
                 for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
@@ -85,7 +85,7 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [Annthyroid_2()]#[TestData()]
+    inputDatas = [Speech_36()]#[TestData()]
     nclusters = 50
     instance_per_bag = 50
     nbags = 10
