@@ -91,3 +91,37 @@ class ConstructBags:
 
         return bags, bags_labels, y_inst
 
+
+class ConstructBagsWithoutClustering:
+
+    def __init__(self, nclusters, nbags, instances_per_bag, bag_contfactor = .3) -> None:
+        self.nclusters = nclusters
+        self.nbags = nbags
+        self.instances_per_bag = instances_per_bag
+        self.bag_contfactor = bag_contfactor
+    
+    def createBags(self, normals, anomalies,seed):
+        np.random.seed(seed)
+        instanceIdxs = np.random.choice(normals.shape[0], size = (self.nbags, self.instances_per_bag), replace = False)
+        
+        bags = {}
+        bags_labels = np.zeros((self.nbags))
+        y_inst = np.zeros((0))
+        for i in range(self.nbags):
+            label = np.random.binomial(1, self.bag_contfactor, size=1)[0]
+            if i == self.nbags-1 and np.all(bags_labels == 0):
+                label = 1
+            n_normals = self.instances_per_bag
+            n_anomalies = 0
+            bags[i] = normals[instanceIdxs[i,:],:]
+            if label == 1:
+                ## [k/2] is kinda high...
+                n_anomalies = np.random.randint(1, int(np.ceil(self.instances_per_bag/2)))
+                anomaly_indices = np.random.choice(anomalies.shape[0], size = (n_anomalies), replace=False)
+                bags[i][-n_anomalies:,:] = anomalies[anomaly_indices,:]
+                n_normals -= n_anomalies
+            bags_labels[i] = label
+            y_inst = np.hstack((y_inst, np.zeros((n_normals)), np.ones((n_anomalies))))
+
+        return bags, bags_labels, y_inst
+

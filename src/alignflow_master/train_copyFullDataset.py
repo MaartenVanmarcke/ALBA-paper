@@ -396,7 +396,7 @@ def main(n_features: int, dataReplacer:DataReplacer, y_inst, Uniquename, load: b
     ##
     parser.modelload = load
     parser.name = "normalaligner"
-    parser.num_epochs = 2#300
+    parser.num_epochs = 200#300
     parser.features = n_features
     parser.model = "Flow2Flow"
     parser.batch_size = 50# 30#16

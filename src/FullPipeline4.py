@@ -1,6 +1,6 @@
 from typing import Any
 from pipeline.constructBags import ConstructBags
-import pipeline.inputData as idata
+import pipeline.inputData as id
 from pipeline.methods import WithAlignmentMethod, WithoutAlignmentMethod, Method, ActiveLearning, RandomSampling, SmartInitialGuessMethod, AlbaMethod
 from pipeline.preprocessor import Preprocessor
 from pipeline.plotPerformance import PlotPerformance
@@ -26,32 +26,43 @@ class FullPipeline:
         pass
 
     def __call__(self, 
-                 inputDatas: list[idata.InputData],
-                 constructBags: ConstructBags,
-                 preprocessor: Preprocessor,
-                 methods: list[Method],
-                 plotPerformance: PlotPerformance,
-                 checker: Checker,
-                 saver:Saver,
+                 inputDatas,#: list[InputData],
+                 constructBags,#: ConstructBags,
+                 preprocessor,#: Preprocessor,
+                 methods,#: list[Method],
+                 plotPerformance,#: PlotPerformance,
+                 checker,#: Checker,
+                 saver,#:Saver,
                  *args: Any, **kwds: Any) -> Any:
         for inputData in inputDatas:
             normals = inputData.getNormals()
             anomalies = inputData.getNormals()
-            for i in range(1):
-                file = open(p, mode = "w")
+            seedcounter = 0
+            query_budget = 100
+            for i in range(5):
+                """file = open(p, mode = "w")
                 file.write(str(i))
-                file.close()    
-                bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,i)
+                file.close() """  
+                bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies, seedcounter)
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
-                _ = checker(bags, bags_labels, X_inst, y_inst)
-                query_budget = 248#int(.25*len(y_inst))
-                query_budget = 50
+                flag = checker(bags, bags_labels, X_inst, y_inst)
+                checkTime = 0
+                while ((not flag) and checkTime<100):
+                    seedcounter += 1
+                    """file = open(p, mode = "w")
+                    file.write(str(seedcounter))
+                    file.close()  """  
+                    bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,seedcounter)
+                    bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
+                    flag = checker(bags, bags_labels, X_inst, y_inst)
+                    checkTime += 1
                 for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
                     end = time.time()
                     self.savetime(inputData.getName() + "."+ method.name, i, end-start)
                     saver(rewardInfo, current, inputData.getName(), method.name+"."+str(i), end-start, parameters= None)
+                seedcounter += 1
         plotPerformance()
         print("Pipeline finished without noticeable errors. :D")
         return None
@@ -76,10 +87,10 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [idata.nbr4()]#[TestData()]
+    inputDatas = [id.Celeba_8()]#[TestData()]
     nclusters = 50
-    instance_per_bag = 40
-    nbags = 25
+    instance_per_bag = 50
+    nbags = 10
     bag_contfactor = .3
     constructBags = ConstructBags(nclusters,nbags, instance_per_bag,bag_contfactor)
     preprocessor = Preprocessor()
@@ -96,7 +107,7 @@ if __name__=="__main__":
     preprocessor = Preprocessor()
     query_budget = int(.25*2)
     query_budget = 5"""
-    methods = [SmartInitialGuessMethod(),AlbaMethod(), WithoutAlignmentMethod(),ActiveLearning(),RandomSampling(),SmartInitialGuessMethod()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
+    methods = [SmartInitialGuessMethod(), AlbaMethod(), WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
     pipeline = FullPipeline()
     plotPerformance = PlotPerformance()
     pipeline(inputDatas, constructBags, preprocessor, methods, plotPerformance, checker, saver)
