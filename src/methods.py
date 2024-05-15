@@ -281,9 +281,11 @@ class MABMethod:
             self.bandit.play(self.i, self.arms)
             if (self.rewardInfo != None):
                 self.rewardInfo.updateReward(self.i, self.arms[self.i].reward)
-                if self.arms[self.i].probsContribution:
+                try:
                     self.rewardInfo.updateProbsContr(self.i, self.arms[self.i].probsContribution)
                     self.rewardInfo.updateAlignContr(self.i, self.arms[self.i].alignContribution)
+                except Exception:
+                    pass
 
         # decide order to play the arms (self.i = ID of the selected arm this round)
         play_order = self.bandit.decide(return_estimate=False)
