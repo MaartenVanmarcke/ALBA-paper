@@ -13,7 +13,7 @@ class ConstructBags:
         self.instances_per_bag = instances_per_bag
         self.bag_contfactor = bag_contfactor
 
-    def _clusterNormals(self, normals,i):
+    def _clusterNormals(self, normals,kk):
         ## Scaling before clustering needed?
         scaler = StandardScaler()
         normals = scaler.fit_transform(normals)
@@ -23,7 +23,7 @@ class ConstructBags:
             n_clusters=self.nclusters,
             #n_init = 10,
             #max_iter=300,
-            random_state=i
+            random_state=kk
         )
 
         kmeans.fit(normals)
@@ -52,9 +52,9 @@ class ConstructBags:
 
         return newClusters
     
-    def createBags(self, normals, anomalies,i):
-        
-        clusters = self._clusterNormals(normals,i)
+    def createBags(self, normals, anomalies,seed):
+        np.random.seed(seed)
+        clusters = self._clusterNormals(normals,seed)
         cluster_idxs = np.random.randint(0,self.nclusters, size = (self.nbags))
         
         bags = {}

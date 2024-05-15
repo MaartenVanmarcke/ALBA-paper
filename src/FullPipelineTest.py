@@ -41,16 +41,16 @@ class FullPipeline:
                 file = open(p, mode = "w")
                 file.write(str(i))
                 file.close()    
-                bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,i)
+                bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies, i)
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                 kkk = 0
                 flag = checker(bags, bags_labels, X_inst, y_inst)
-                while flag & kkk<5:
+                while (not flag) & kkk<5:
                     kkk += 1
                     file = open(p, mode = "w")
                     file.write(str(i+kkk))
                     file.close()    
-                    bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,i)
+                    bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,i+kkk)
                     bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                     flag = checker(bags, bags_labels, X_inst, y_inst)
                 query_budget = 248#int(.25*len(y_inst))
