@@ -306,8 +306,8 @@ def train(args, dataReplacer: DataReplacer, y_inst):
         logger.end_epoch()  
     print("END", time.time()-xxx)
     print("summm", summm)
-    vis.makevideo()
-    vis.visualizeLoss(args = args)
+    #vis.makevideo()
+    #vis.visualizeLoss(args = args)
 
 
 def get_data_loaders(args,data):
