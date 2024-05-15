@@ -78,8 +78,8 @@ class FullPipeline:
 if __name__=="__main__":
     inputDatas = [Speech_36()]#[TestData()]
     nclusters = 50
-    instance_per_bag = 40
-    nbags = 25
+    instance_per_bag = 50
+    nbags = 10
     bag_contfactor = .3
     constructBags = ConstructBags(nclusters,nbags, instance_per_bag,bag_contfactor)
     preprocessor = Preprocessor()
