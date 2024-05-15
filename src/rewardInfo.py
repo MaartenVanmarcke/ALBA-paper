@@ -23,6 +23,14 @@ class RewardInfo:
         for bag in range(nbags):
             self.rewards[bag] = []
 
+        self.probsContr = {}
+        for bag in range(nbags):
+            self.probsContr[bag] = []
+
+        self.alignContr = {}
+        for bag in range(nbags):
+            self.alignContr[bag] = []
+
         self.banditRewards = {}
         for bag in range(nbags):
             self.banditRewards[bag] = []
@@ -56,7 +64,15 @@ class RewardInfo:
         if (reward != None):
             self.rewards[bag].append(reward)
 
-    def updateAllRewards(self, rewards: [float]):
+    def updateProbsContr(self, bag: int, contr: float):
+        if (contr != None):
+            self.probsContr[bag].append(contr)
+
+    def updateAlignContr(self, bag: int, contr: float):
+        if (contr != None):
+            self.alignContr[bag].append(contr)
+
+    def updateAllRewards(self, rewards):
         if (len(rewards)!= len(self.rewards.keys())):
             raise Exception("Unvalid argument")
         for bag in range(rewards):
@@ -64,6 +80,12 @@ class RewardInfo:
 
     def getRewards(self, bag:int):
         return self.rewards[bag]
+    
+    def getAllProbsContrs(self):
+        return self.probsContr
+    
+    def getAllAlignContrs(self):
+        return self.alignContr
     
     def getLastReward(self, bag:int):
         return self.getRewards(bag)[-1]

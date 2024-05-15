@@ -19,6 +19,8 @@ class Saver():
         scoresAucRocBag = ["auc_roc_bag"] + rewardInfo.getAUC()["rocbag"]
         scoresAucPRBag = ["auc_pr_bag"] + rewardInfo.getAUC()["prbag"]
         rewards = rewardInfo.getAllRewards()
+        probContr = rewardInfo.getAllProbsContrs()
+        alignContr = rewardInfo.getAllAlignContrs()
         origdir = os.path.join(current, "results", dataName)
         mm = 0
         dir = origdir + str(mm)
@@ -36,6 +38,10 @@ class Saver():
             writer.writerows([["Date", date.today()],
                               ["Time", time]] + self.globalParams + parameters)
             for k, v in rewards.items():
-                writer.writerow(["bag "+str(k)]+v)
+                writer.writerow(["Rewards bag "+str(k)]+v)
+            if len(probContr[0])>0:
+                for k in probContr.keys():
+                    writer.writerow(["Prob contr bag "+str(k)]+probContr[k])
+                    writer.writerow(["Align contr bag "+str(k)]+alignContr[k])
             writer.writerows(self.globalParams + parameters)
         return None
