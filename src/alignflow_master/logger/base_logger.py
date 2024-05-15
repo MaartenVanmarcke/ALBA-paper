@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 
 
 class BaseLogger(object):
@@ -15,7 +15,7 @@ class BaseLogger(object):
         self.log_path = os.path.join(self.save_dir, '{}.log'.format(args.name))
         self.model = model
         log_dir = os.path.join('logs', args.name + '_' + datetime.now().strftime('%b%d_%H%M'))
-        self.summary_writer = SummaryWriter(log_dir=log_dir)
+        #self.summary_writer = SummaryWriter(log_dir=log_dir)
 
         self.epoch = 1
         # Current iteration in epoch (i.e., # examples seen in the current epoch)
@@ -38,7 +38,7 @@ class BaseLogger(object):
             if print_to_stdout:
                 self.write('[{}: {:.3g}]'.format(k, v))
             k = k.replace('_', '/')  # Group in TensorBoard by phase
-            self.summary_writer.add_scalar(k, v, self.global_step)
+            #self.summary_writer.add_scalar(k, v, self.global_step)
 
     def start_iter(self, src_filenames=None):
         """Log info for start of an iteration."""
