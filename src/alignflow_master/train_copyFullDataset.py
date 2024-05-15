@@ -10,23 +10,15 @@ current = pathlib.Path().absolute()
 sys.path.insert(1, os.path.join(current, "src", "alignflow_master"))
 
 import models
-import csv
-from sklearn.metrics import roc_auc_score
 from args import TrainArgParser
-from dataset import PairedDataset, UnpairedDataset
-from evaluation import evaluate
-from evaluation.criteria import mse
 from logger import TrainLogger
 from saver import ModelSaver
-from torch.utils.data import DataLoader
 from dataReplacer import DataReplacer
 from dataInput import datA, y_inst
-from pyod.models.iforest import IForest
 
 import torch
 import os
 import pathlib
-import json
 import matplotlib.pyplot as plt 
 import numpy as np
 
