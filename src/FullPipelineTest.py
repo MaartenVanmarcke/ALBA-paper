@@ -45,7 +45,7 @@ class FullPipeline:
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                 kkk = 0
                 flag = checker(bags, bags_labels, X_inst, y_inst)
-                while (not flag) & kkk<5:
+                while ((not flag) and kkk<5):
                     kkk += 1
                     file = open(p, mode = "w")
                     file.write(str(i+kkk))

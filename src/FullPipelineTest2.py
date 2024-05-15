@@ -53,7 +53,6 @@ class FullPipeline:
                     bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,i+kkk)
                     bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                     flag = checker(bags, bags_labels, X_inst, y_inst)
-                    print(flag)
                 query_budget = 248#int(.25*len(y_inst))
                 query_budget = 2
                 for method in methods:
