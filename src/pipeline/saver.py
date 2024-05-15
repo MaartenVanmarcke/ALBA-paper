@@ -18,12 +18,13 @@ class Saver():
         scoresAucPR = ["auc_pr"] + rewardInfo.getAUC()["pr"]
         scoresAucRocBag = ["auc_roc_bag"] + rewardInfo.getAUC()["rocbag"]
         scoresAucPRBag = ["auc_pr_bag"] + rewardInfo.getAUC()["prbag"]
+        rewards = rewardInfo.getAllRewards()
         origdir = os.path.join(current, "results", dataName)
         mm = 0
         dir = origdir + str(mm)
         while os.path.exists(dir) & os.path.exists(os.path.join(dir, methodName+".csv")):
             mm += 1
-            dir += str(mm)
+            dir = origdir + str(mm)
         if not os.path.exists(dir):
             os.mkdir(dir)
         with open(os.path.join(dir, methodName+".csv"), 'w',newline='') as writeFile:
@@ -31,7 +32,10 @@ class Saver():
             writer.writerows([scoresAucRoc,
                               scoresAucPR,
                               scoresAucRocBag,
-                              scoresAucPRBag,
-                              ["Date", date.today()],
+                              scoresAucPRBag])
+            writer.writerows([["Date", date.today()],
                               ["Time", time]] + self.globalParams + parameters)
+            for k, v in rewards.items():
+                writer.writerow(["bag "+str(k)]+v)
+            writer.writerows(self.globalParams + parameters)
         return None

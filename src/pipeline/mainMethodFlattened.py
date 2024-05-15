@@ -275,7 +275,7 @@ class MainMethodFlattened():
                             print("No model found to remove")
 
                     # Align the instances
-                    aligner = main(dataReplacer, y_inst, load)
+                    aligner = main(n_features, dataReplacer, y_inst, dataname + "."+ self.versionname + "." + str(experimentnumber), load)
 
                     # Get the aligned data
                     alignedData = dataReplacer.getLatent()

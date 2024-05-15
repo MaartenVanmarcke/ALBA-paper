@@ -26,26 +26,35 @@ class FullPipeline:
         pass
 
     def __call__(self, 
-                 inputDatas: list[InputData],
-                 constructBags: ConstructBags,
-                 preprocessor: Preprocessor,
-                 methods: list[Method],
-                 plotPerformance: PlotPerformance,
-                 checker: Checker,
-                 saver:Saver,
+                 inputDatas,#: list[InputData],
+                 constructBags,#: ConstructBags,
+                 preprocessor,#: Preprocessor,
+                 methods,#: list[Method],
+                 plotPerformance,#: PlotPerformance,
+                 checker,#: Checker,
+                 saver,#:Saver,
                  *args: Any, **kwds: Any) -> Any:
         for inputData in inputDatas:
             normals = inputData.getNormals()
             anomalies = inputData.getNormals()
-            for i in range(1):
+            for i in range(2):
                 file = open(p, mode = "w")
                 file.write(str(i))
                 file.close()    
-                bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,i)
+                bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies, i)
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
-                _ = checker(bags, bags_labels, X_inst, y_inst)
+                kkk = 0
+                flag = checker(bags, bags_labels, X_inst, y_inst)
+                while ((not flag) and kkk<5):
+                    kkk += 1
+                    file = open(p, mode = "w")
+                    file.write(str(i+kkk))
+                    file.close()    
+                    bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,i+kkk)
+                    bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
+                    flag = checker(bags, bags_labels, X_inst, y_inst)
                 query_budget = 248#int(.25*len(y_inst))
-                query_budget = 100
+                query_budget = 3
                 for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
@@ -78,7 +87,7 @@ class FullPipeline:
 if __name__=="__main__":
     inputDatas = [Speech_36()]#[TestData()]
     nclusters = 50
-    instance_per_bag = 40
+    instance_per_bag = 50
     nbags = 10
     bag_contfactor = .3
     constructBags = ConstructBags(nclusters,nbags, instance_per_bag,bag_contfactor)

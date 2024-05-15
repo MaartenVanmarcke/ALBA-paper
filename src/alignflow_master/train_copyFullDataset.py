@@ -21,6 +21,12 @@ import os
 import pathlib
 import matplotlib.pyplot as plt 
 import numpy as np
+    
+p =  os.path.join(current, "src", "seed.txt")
+file = open(p)
+seed = int(file.read())
+file.close()
+np.random.seed(seed)
 
 class Args(object):
     def __init__(self) -> None:
@@ -390,10 +396,10 @@ def main(n_features: int, dataReplacer:DataReplacer, y_inst, Uniquename, load: b
     ##
     parser.modelload = load
     parser.name = "normalaligner"
-    parser.num_epochs = 10#300
+    parser.num_epochs = 2#300
     parser.features = n_features
     parser.model = "Flow2Flow"
-    parser.batch_size = 60# 30#16
+    parser.batch_size = 50# 30#16
     parser.iters_per_print= parser.batch_size
     parser.lr =.005#.005# 2e-4
     parser.rnvp_lr =.005#.005# 2e-4
@@ -438,16 +444,6 @@ def main(n_features: int, dataReplacer:DataReplacer, y_inst, Uniquename, load: b
 
 
 if __name__ == '__main__':
-    
-    import os
-    import pathlib
-    from sklearn import datasets
-    current = pathlib.Path().parent.absolute().parent.absolute()
-    p =  os.path.join(current,"ALBA-paper", "src", "seed.txt")
-    file = open(p)
-    seed = int(file.read())
-    file.close()
-    np.random.seed(seed)
 
     """poiints, yy = datasets.make_moons(60, noise = 0.1, random_state = 1302)
     bag1 = []

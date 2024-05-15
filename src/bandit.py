@@ -360,7 +360,7 @@ class DomainArm(Arm):
         #H = self._compute_entropy_abs(p0, p1)
         
         ## VERSION 2:
-        self.alpha = 0.5 # How much does the change in alignment weight through?
+        self.alpha = .9999 # How much does the change in alignment weight through?
         self.probsContribution = np.sum(np.abs(p0-p1))/len(p0)
         self.alignContribution = np.sum(np.abs(np.exp(-np.power(dist1,2)/2)-np.exp(-np.power(dist0,2)/2)))/len(p0)
         self.reward = (1-self.alpha) * self.probsContribution + self.alpha * self.alignContribution
