@@ -13,11 +13,14 @@ class Checker:
         f2 = self.check2(bags, bags_labels, X_inst, y_inst)
         f3 = self.check3(bags, bags_labels, X_inst, y_inst)
         f4 = self.check4(bags, bags_labels, X_inst, y_inst)
+        print(np.all(np.array([f1,f2,f3,f4])))
         if not np.all(np.array([f1,f2,f3,f4])):
+            print("a")
             return False
             """print("Not all checks are satisfied: {}".format([f1,f2,f3,f4]))
             return True"""
             #raise Exception("Not all checks are satisfied: {}".format([f1,f2,f3,f4]))
+        print("b")
         return True
         
     def check1(self, bags, bags_labels, X_inst, y_inst):
