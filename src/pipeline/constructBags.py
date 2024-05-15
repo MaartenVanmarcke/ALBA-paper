@@ -16,7 +16,7 @@ class ConstructBags:
     def _clusterNormals(self, normals,kk):
         ## Scaling before clustering needed?
         scaler = StandardScaler()
-        normals = scaler.fit_transform(normals)
+        normalstransf = scaler.fit_transform(normals)
 
         kmeans = KMeans(
             init="random", #"k-means++"
@@ -26,7 +26,7 @@ class ConstructBags:
             random_state=kk
         )
 
-        kmeans.fit(normals)
+        kmeans.fit(normalstransf)
         assignment = kmeans.labels_
 
         clusters = {}
