@@ -211,6 +211,28 @@ class Speech_36(InputData):
     def getNumberOfFeatures(self):
         return len(self.normals[0,:]) # 5
     
+class Speech_36_copy(InputData):
+    
+    def __init__(self) -> None:
+        name = "36_speech_copy"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','36_speech.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+    
 class Yeast_47(InputData):
     
     def __init__(self) -> None:
