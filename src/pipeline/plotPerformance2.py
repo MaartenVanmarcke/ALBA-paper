@@ -30,7 +30,7 @@ class PlotPerformance:
                     with open(f, 'r') as readFile:
                         reader = csv.reader(readFile)
                         lines = list(reader)
-                        if names[-1] == lastname:
+                        if len(names)> 0 and names[-1] == lastname:
                             for line in lines:
                                 if line[0] == "auc_roc":
                                     aucroc[-1] = aucroc[-1] + line[1:]
