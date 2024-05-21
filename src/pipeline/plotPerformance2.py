@@ -34,9 +34,9 @@ class PlotPerformance:
                         if len(names)> 0 and names[-1] == lastname:
                             for line in lines:
                                 if line[0] == "auc_roc":
-                                    aucroc[-1] = np.asarray(aucroc[-1]) + np.asarray(line[1:])
+                                    aucroc[-1] = np.asarray(aucroc[-1], dtype = float) + np.asarray([float(ww) for ww in line[1:]], dtype = float)
                                 if line[0] == "auc_roc_bag":
-                                    aucrocbag[-1] = np.asarray(aucrocbag[-1]) + np.asarray(line[1:])
+                                    aucrocbag[-1] = np.asarray(aucrocbag[-1], dtype = float) + np.asarray([float(ww) for ww in line[1:]], dtype = float)
                         else:
                             names.append(f.split("\\")[-1].split(".")[0])
                             for line in lines:
@@ -47,7 +47,7 @@ class PlotPerformance:
                             lastname = names[-1]
             plt.figure()
             for i in range(len(names)):
-                plt.plot(np.arange(0,len(aucroc[i])),[float(k) for k in aucroc[i]], label = names[i])
+                plt.plot(np.arange(0,len(aucroc[i])),aucroc[i], label = names[i])
             plt.ylim([0,1])
             plt.legend()
             plt.title(self.name)
