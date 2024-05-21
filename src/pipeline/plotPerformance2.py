@@ -53,7 +53,7 @@ class PlotPerformance:
             plt.ylabel("AUC ROC")
             plt.xlabel("Instances Queried")
             plt.grid()
-            plt.savefig(self.name+"AUCROC.csv")
+            plt.savefig(self.name+"AUCROC.png")
             plt.figure()
             for i in range(len(names)):
                 plt.plot(np.arange(0,len(aucrocbag[i])),[float(k) for k in aucrocbag[i]], label = names[i])
@@ -63,7 +63,7 @@ class PlotPerformance:
             plt.ylabel("AUC ROC BAG")
             plt.xlabel("Instances Queried")
             plt.grid()
-            plt.savefig(self.name+"AUCROCBag.csv")
+            plt.savefig(self.name+"AUCROCBag.png")
             plt.show()
             return
 
