@@ -2,6 +2,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import os
 import pathlib
+import numpy as np
 current = pathlib.Path().absolute()
 current = os.path.join(current, "src")
 import numpy as np
@@ -33,9 +34,9 @@ class PlotPerformance:
                         if len(names)> 0 and names[-1] == lastname:
                             for line in lines:
                                 if line[0] == "auc_roc":
-                                    aucroc[-1] = aucroc[-1] + line[1:]
+                                    aucroc[-1] = np.asarray(aucroc[-1]) + np.asarray(line[1:])
                                 if line[0] == "auc_roc_bag":
-                                    aucrocbag[-1] = aucrocbag[-1] + line[1:]
+                                    aucrocbag[-1] = np.asarray(aucrocbag[-1]) + np.asarray(line[1:])
                         else:
                             names.append(f.split("\\")[-1].split(".")[0])
                             for line in lines:
