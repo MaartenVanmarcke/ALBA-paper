@@ -1,5 +1,5 @@
 from typing import Any
-from pipeline.constructBags import ConstructBags
+from pipeline.constructBags import ConstructBagsOpt
 import pipeline.inputData as id
 from pipeline.methods import WithAlignmentMethod, WithoutAlignmentMethod, Method, ActiveLearning, RandomSampling, SmartInitialGuessMethod, AlbaMethod
 from pipeline.preprocessor import Preprocessor
@@ -100,12 +100,12 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [id.ALOI_1()]#[TestData()]
-    nclusters = 50
+    inputDatas = [id.Yeast_47()]#[TestData()]
+    nclusters = 10
     instance_per_bag = 50
     nbags = 10
     bag_contfactor = .3
-    constructBags = ConstructBags(nclusters,nbags, instance_per_bag,bag_contfactor)
+    constructBags = ConstructBagsOpt(nclusters,nbags, instance_per_bag,bag_contfactor)
     preprocessor = Preprocessor()
     checker = Checker()
     saver = Saver()

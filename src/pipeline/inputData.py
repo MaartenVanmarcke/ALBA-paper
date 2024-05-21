@@ -56,14 +56,14 @@ class TestData(InputData):
     
 
 
-class ALOI_1(InputData):
+class Pima_29(InputData):
     
     def __init__(self) -> None:
-        name = "1_ALOI"
+        name = "29_Pima"
         super().__init__(name)
 
     def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','1_ALOI.npz'), allow_pickle=True)
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','29_Pima.npz'), allow_pickle=True)
         data, labels = data['X'], data['y']
         idxs = labels == 0
         self.normals = data[idxs, :]
@@ -78,147 +78,14 @@ class ALOI_1(InputData):
     def getNumberOfFeatures(self):
         return len(self.normals[0,:]) # 5
 
-class Annthyroid_2(InputData):
+class Vowels_40(InputData):
     
     def __init__(self) -> None:
-        name = "2_annthyroid"
+        name = "40_vowels"
         super().__init__(name)
 
     def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','2_annthyroid.npz'), allow_pickle=True)
-        data, labels = data['X'], data['y']
-        idxs = labels == 0
-        self.normals = data[idxs, :]
-        self.anomalies = data[np.invert(idxs), :]
-    
-    def getNumberOfInstances(self):
-        return len(self.normals)+len(self.anomalies) # 4819
-    
-    def getNumberOfAnomalies(self):
-        return len(self.anomalies) # 257
-    
-    def getNumberOfFeatures(self):
-        return len(self.normals[0,:]) # 5
-    
-class Cardiotocography_7(InputData):
-    
-    def __init__(self) -> None:
-        name = "7_Cardiotocography"
-        super().__init__(name)
-
-    def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','7_Cardiotocography.npz'), allow_pickle=True)
-        data, labels = data['X'], data['y']
-        idxs = labels == 0
-        self.normals = data[idxs, :]
-        self.anomalies = data[np.invert(idxs), :]
-    
-    def getNumberOfInstances(self):
-        return len(self.normals)+len(self.anomalies) # 4819
-    
-    def getNumberOfAnomalies(self):
-        return len(self.anomalies) # 257
-    
-    def getNumberOfFeatures(self):
-        return len(self.normals[0,:]) # 5
-    
-
-class Celeba_8(InputData):
-    
-    def __init__(self) -> None:
-        name = "8_celeba"
-        super().__init__(name)
-
-    def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','8_celeba.npz'), allow_pickle=True)
-        data, labels = data['X'], data['y']
-        idxs = labels == 0
-        self.normals = data[idxs, :]
-        self.anomalies = data[np.invert(idxs), :]
-    
-    def getNumberOfInstances(self):
-        return len(self.normals)+len(self.anomalies) # 4819
-    
-    def getNumberOfAnomalies(self):
-        return len(self.anomalies) # 257
-    
-    def getNumberOfFeatures(self):
-        return len(self.normals[0,:]) # 5
-    
-class Letter_20(InputData):
-    
-    def __init__(self) -> None:
-        name = "20_letter"
-        super().__init__(name)
-
-    def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','20_letter.npz'), allow_pickle=True)
-        data, labels = data['X'], data['y']
-        idxs = labels == 0
-        self.normals = data[idxs, :]
-        self.anomalies = data[np.invert(idxs), :]
-    
-    def getNumberOfInstances(self):
-        return len(self.normals)+len(self.anomalies) # 4819
-    
-    def getNumberOfAnomalies(self):
-        return len(self.anomalies) # 257
-    
-    def getNumberOfFeatures(self):
-        return len(self.normals[0,:]) # 5
-    
-class SpamBase_35(InputData):
-    
-    def __init__(self) -> None:
-        name = "35_SpamBase"
-        super().__init__(name)
-
-    def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','35_SpamBase.npz'), allow_pickle=True)
-        data, labels = data['X'], data['y']
-        idxs = labels == 0
-        self.normals = data[idxs, :]
-        self.anomalies = data[np.invert(idxs), :]
-    
-    def getNumberOfInstances(self):
-        return len(self.normals)+len(self.anomalies) # 4819
-    
-    def getNumberOfAnomalies(self):
-        return len(self.anomalies) # 257
-    
-    def getNumberOfFeatures(self):
-        return len(self.normals[0,:]) # 5
-    
-class Speech_36(InputData):
-    
-    def __init__(self) -> None:
-        name = "36_speech"
-        super().__init__(name)
-
-    def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','36_speech.npz'), allow_pickle=True)
-        data, labels = data['X'], data['y']
-        idxs = labels == 0
-        self.normals = data[idxs, :]
-        self.anomalies = data[np.invert(idxs), :]
-    
-    def getNumberOfInstances(self):
-        return len(self.normals)+len(self.anomalies) # 4819
-    
-    def getNumberOfAnomalies(self):
-        return len(self.anomalies) # 257
-    
-    def getNumberOfFeatures(self):
-        return len(self.normals[0,:]) # 5
-    
-class Speech_36_copy(InputData):
-    
-    def __init__(self) -> None:
-        name = "36_speech_copy"
-        super().__init__(name)
-
-    def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','36_speech.npz'), allow_pickle=True)
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','40_vowels.npz'), allow_pickle=True)
         data, labels = data['X'], data['y']
         idxs = labels == 0
         self.normals = data[idxs, :]
@@ -254,6 +121,156 @@ class Yeast_47(InputData):
     
     def getNumberOfFeatures(self):
         return len(self.normals[0,:]) # 5
+    
 
-if __name__=="__main__":
-    ff = Celeba_8()
+
+
+
+
+
+
+class Letter_20(InputData):
+    
+    def __init__(self) -> None:
+        name = "20_letter"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','20_letter.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+    
+class Cardio_6(InputData):
+    
+    def __init__(self) -> None:
+        name = "6_cardio"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','6_cardio.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+   
+    
+    
+class checkData(InputData):
+    
+    def __init__(self) -> None:
+        name = "29_Pima"
+        self.name = name 
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench',self.name+'.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+
+
+
+
+
+
+
+
+#######################
+
+
+class Pima_29_Equal(InputData):
+    
+    def __init__(self) -> None:
+        name = "29_Pima_equal_distr"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','29_Pima.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+
+class Vowels_40_Equal(InputData):
+    
+    def __init__(self) -> None:
+        name = "40_vowels_equal_distr"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','40_vowels.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+    
+class Yeast_47_Equal(InputData):
+    
+    def __init__(self) -> None:
+        name = "47_yeast_equal_distr"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','47_yeast.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+    

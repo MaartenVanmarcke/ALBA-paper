@@ -12,7 +12,7 @@ class Preprocessor:
         for k, v in bags.items():
             X_inst = np.vstack((X_inst, v))
             
-        scaler = StandardScaler().fit(X_inst)
+        """scaler = StandardScaler().fit(X_inst)
         X_inst = scaler.transform(X_inst)
         newbags = {}
         ll = 0
@@ -20,11 +20,11 @@ class Preprocessor:
             newbags[k] = scaler.transform(v)
             if not np.all(newbags[k] == X_inst[ll:ll+len(newbags[k])]):
                 raise Exception("Implementation Error!!!")
-            ll+=len(newbags[k])
+            ll+=len(newbags[k])"""
 
 
 
-        return newbags, bags_labels, X_inst, y_inst
+        return bags, bags_labels, X_inst, y_inst
     
 
 class PreprocessorWithProjection:

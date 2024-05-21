@@ -1,5 +1,5 @@
 from typing import Any
-from pipeline.constructBags import ConstructBags
+from pipeline.constructBags import ConstructBagsOpt
 import pipeline.inputData as id
 from pipeline.methods import WithAlignmentMethod, WithoutAlignmentMethod, Method, ActiveLearning, RandomSampling, SmartInitialGuessMethod, AlbaMethod
 from pipeline.preprocessor import Preprocessor
@@ -9,6 +9,7 @@ from pipeline.saver import Saver
 import time
 import csv
 import sys
+import numpy as np
 import warnings
 sys.path.insert(1, '../')
 import os
@@ -45,23 +46,35 @@ class FullPipeline:
                 file.close() """  
                 bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies, seedcounter)
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
+                np.random.seed(seedcounter)
+                n_a_bags = np.count_nonzero(bags_labels)
+                n_a = np.count_nonzero(y_inst)
                 flag = checker(bags, bags_labels, X_inst, y_inst)
                 checkTime = 0
                 while ((not flag) and checkTime<100):
                     seedcounter += 1
+                    np.random.seed(seedcounter)
                     """file = open(p, mode = "w")
                     file.write(str(seedcounter))
                     file.close()  """  
                     bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,seedcounter)
                     bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
+                    n_a_bags = np.count_nonzero(bags_labels)
+                    n_a = np.count_nonzero(y_inst)
                     flag = checker(bags, bags_labels, X_inst, y_inst)
                     checkTime += 1
+                print("Number of anomalous bags:",n_a_bags )
+                print("Number of anomalies:",n_a )
+                saver.addLocalParam("seed", seedcounter)
+                saver.addLocalParam("Number of anomalous bags", n_a_bags)
+                saver.addLocalParam("Number of anomalies", n_a)
                 for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
                     end = time.time()
                     self.savetime(inputData.getName() + "."+ method.name, i, end-start)
                     saver(rewardInfo, current, inputData.getName(), method.name+"."+str(i), end-start, parameters= None)
+                saver.flush()
                 seedcounter += 1
         plotPerformance()
         print("Pipeline finished without noticeable errors. :D")
@@ -87,12 +100,12 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [id.Annthyroid_2()]#[TestData()]
-    nclusters = 50
+    inputDatas = [id.Vowels_40()]#[TestData()]
+    nclusters = 10
     instance_per_bag = 50
     nbags = 10
     bag_contfactor = .3
-    constructBags = ConstructBags(nclusters,nbags, instance_per_bag,bag_contfactor)
+    constructBags = ConstructBagsOpt(nclusters,nbags, instance_per_bag,bag_contfactor)
     preprocessor = Preprocessor()
     checker = Checker()
     saver = Saver()
@@ -107,7 +120,7 @@ if __name__=="__main__":
     preprocessor = Preprocessor()
     query_budget = int(.25*2)
     query_budget = 5"""
-    methods = [SmartInitialGuessMethod(), AlbaMethod(), WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
+    methods = [AlbaMethod(),SmartInitialGuessMethod(),  WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
     pipeline = FullPipeline()
     plotPerformance = PlotPerformance()
     pipeline(inputDatas, constructBags, preprocessor, methods, plotPerformance, checker, saver)

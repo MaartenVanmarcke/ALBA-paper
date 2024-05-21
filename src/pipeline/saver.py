@@ -6,10 +6,16 @@ from datetime import date
 class Saver():
     def __init__(self) -> None:
         self.globalParams = []
+        self.localParams = []
         pass
+
+    def flush(self):
+        self.localParams = []
 
     def addGlobalParam(self, name, value):
         self.globalParams.append([name, value])
+    def addLocalParam(self, name, value):
+        self.localParams.append([name, value])
 
     def __call__(self, rewardInfo, current, dataName, methodName,time,parameters = None,*args: Any, **kwds: Any) -> Any:
         if parameters == None:
@@ -36,7 +42,7 @@ class Saver():
                               scoresAucRocBag,
                               scoresAucPRBag])
             writer.writerows([["Date", date.today()],
-                              ["Time", time]] + self.globalParams + parameters)
+                              ["Time", time]] + self.localParams)
             for k, v in rewards.items():
                 writer.writerow(["Rewards bag "+str(k)]+v)
             if len(probContr[0])>0:
