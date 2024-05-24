@@ -210,7 +210,7 @@ class MainMethodFlattened():
             import warnings
             warnings.filterwarnings('ignore')
 
-            for t in range(query_budget):
+            for t in range(query_budget+1):
                 queries = alba.fit_query(training_data, self.probs, True)
 
                 #!!!!!!!

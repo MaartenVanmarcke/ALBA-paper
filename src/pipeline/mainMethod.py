@@ -213,7 +213,7 @@ class MainMethod():
             weights = dataReplacer.getWeights()
             n_features = originalBags[0].shape[1]
             ## THE ULTIMATE LOOP
-            for iteration in range(query_budget):
+            for iteration in range(query_budget+1):
                     
                 print("=================")
                 print("ITERATION", iteration)
