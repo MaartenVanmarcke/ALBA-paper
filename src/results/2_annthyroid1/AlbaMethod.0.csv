@@ -1,0 +1,23 @@
+auc_roc,0.3101464435146444,0.32526626093571703
+auc_pr,0.029117706801908505,0.02959353024284455
+auc_roc_bag,0.42857142857142855,0.42857142857142855
+auc_pr_bag,0.25925925925925924,0.25595238095238093
+Date,2024-05-24
+Time,6.0891501903533936
+seed,0
+Number of anomalous bags,3
+Number of anomalies,22
+Rewards bag 0,0.046835063792684206
+Rewards bag 1
+Rewards bag 2
+Rewards bag 3
+Rewards bag 4
+Rewards bag 5
+Rewards bag 6
+Rewards bag 7
+Rewards bag 8
+Rewards bag 9
+n_clusters,10
+instance_per_bag,50
+n_bags,10
+bag_contfactor,0.3

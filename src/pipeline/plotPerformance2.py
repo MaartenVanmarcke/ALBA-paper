@@ -13,58 +13,231 @@ file.close()
 np.random.seed(seed)
 
 class PlotPerformance:
-    def __init__(self, name) -> None:
+    def __init__(self, name, title) -> None:
         self.name = name
+        self.title = title
         pass
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-            names = []
-            aucroc = []
-            aucrocbag = []
-            directory = os.path.join(current, "results",self.name)
-            lastname = ""
-            import csv
-            for filename in os.listdir(directory):
-                f = os.path.join(directory, filename)
-                # checking if it is a file
-                if os.path.isfile(f):
-                    with open(f, 'r') as readFile:
-                        reader = csv.reader(readFile)
-                        lines = list(reader)
-                        if len(names)> 0 and names[-1] == lastname:
-                            for line in lines:
-                                if line[0] == "auc_roc":
-                                    aucroc[-1] = np.asarray(aucroc[-1], dtype = float) + np.asarray([float(ww) for ww in line[1:]], dtype = float)
-                                if line[0] == "auc_roc_bag":
-                                    aucrocbag[-1] = np.asarray(aucrocbag[-1], dtype = float) + np.asarray([float(ww) for ww in line[1:]], dtype = float)
-                        else:
-                            names.append(f.split("\\")[-1].split(".")[0])
-                            for line in lines:
-                                if line[0] == "auc_roc":
-                                    aucroc.append(line[1:])
-                                if line[0] == "auc_roc_bag":
-                                    aucrocbag.append(line[1:])
-                            lastname = names[-1]
-            plt.figure()
-            for i in range(len(names)):
-                plt.plot(np.arange(0,len(aucroc[i])),aucroc[i], label = names[i])
-            plt.ylim([0,1])
-            plt.legend()
-            plt.title(self.name)
-            plt.ylabel("AUC ROC")
-            plt.xlabel("Instances Queried")
-            plt.grid()
-            plt.savefig(self.name+"AUCROC.png")
-            plt.figure()
-            for i in range(len(names)):
-                plt.plot(np.arange(0,len(aucrocbag[i])),[float(k) for k in aucrocbag[i]], label = names[i])
-            plt.ylim([0,1])
-            plt.legend()
-            plt.title(self.name)
-            plt.ylabel("AUC ROC BAG")
-            plt.xlabel("Instances Queried")
-            plt.grid()
-            plt.savefig(self.name+"AUCROCBag.png")
+            fig, axs = plt.subplots(1,2, sharex=True, sharey=True, figsize = (8,4))
+            fig.subplots_adjust(hspace=0.01, wspace=0.01)
+            for nn in range(len(self.name)):
+                names = []
+                countsaucroc = []
+                countsaucrocbag = []
+                aucroc = []
+                aucrocbag = []
+                directory = os.path.join(current, "results",self.name[nn])
+                import csv
+                for filename in os.listdir(directory):
+                    f = os.path.join(directory, filename)
+                    # checking if it is a file
+                    if os.path.isfile(f):
+                        with open(f, 'r') as readFile:
+                            reader = csv.reader(readFile)
+                            lines = list(reader)
+                            currentname = f.split("\\")[-1].split(".")[0]
+                            if len(names)> 0 and names[-1] == currentname:
+                                for line in lines:
+                                    if line[0] == "auc_roc":
+                                        aucroc[-1] = aucroc[-1] + np.asarray([float(ww) for ww in line[1:]], dtype = float)
+                                        countsaucroc[-1] += 1
+                                    if line[0] == "auc_roc_bag":
+                                        aucrocbag[-1] = aucrocbag[-1] + np.asarray([float(ww) for ww in line[1:]], dtype = float)
+                                        countsaucrocbag[-1] += 1
+                            else:
+                                names.append(f.split("\\")[-1].split(".")[0])
+                                for line in lines:
+                                    if line[0] == "auc_roc":
+                                        aucroc.append( np.asarray([float(ww) for ww in line[1:]], dtype = float))
+                                    if line[0] == "auc_roc_bag":
+                                        aucrocbag.append( np.asarray([float(ww) for ww in line[1:]], dtype = float))
+                                countsaucroc.append(1)
+                                countsaucrocbag.append(1)
+                todel = None
+                toput = None
+                for i in range(len(names)):
+                    if names[i] == "AlbaMethod":
+                        names[i] = "ALBA"
+                    if names[i] == "SmartInitialGuess":
+                        names[i] = "AMIB"
+                        toput = i
+                    if names[i] == "RandomSampling":
+                        names[i] = "Random Sampling"
+                    if names[i] == "BasicActiveLearning":
+                        names[i] = "Uncertainty Sampling"
+                    if names[i] == "WithoutAlignment":
+                        todel= i
+                if todel != None:
+                    names.pop(todel)
+                    countsaucroc.pop(todel)
+                    countsaucrocbag.pop(todel)
+                    aucroc.pop(todel)
+                    aucrocbag.pop(todel)
+                if toput > todel:
+                    toput -= 1
+                name = names.pop(toput)
+                names.insert(0,name)
+                score = countsaucroc.pop(toput)
+                countsaucroc.insert(0,score)
+                score = countsaucrocbag.pop(toput)
+                countsaucrocbag.insert(0,score)
+                score = aucroc.pop(toput)
+                aucroc.insert(0,score)
+                score = aucrocbag.pop(toput)
+                aucrocbag.insert(0,score)
+
+                if False:
+                    names.append("SIGEnsemble")
+                    countsaucrocbag.append(1)
+                    aucrocbag.append(np.zeros((0)))
+                    i = 0
+                    while names[i] != "SmartInitialGuess":
+                        i += 1 
+                    dummy = aucroc[i]
+                    fltr = np.ones((5))/5
+                    dummy = np.convolve(dummy,fltr, mode="same")
+                    print(dummy)
+                    aucroc.append(dummy)
+                    countsaucroc.append(countsaucroc[i])
+                colors = ["#d62728", "#2ca02c", "#ff7f0e","#1f77b4"]
+                for i in range(len(names)):
+                    if names[i] == "AMIB":
+                        axs[nn].plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i], label = names[i],linewidth=2.0, c= colors[i])
+                    else:
+                        axs[nn].plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i],"--", label = names[i], c= colors[i])
+                    axs[nn].set_ylim(0,1)
+                    axs[nn].set_xlim(0,100)
+                    #axs[nn].set_title(self.title[nn])
+                    axs[nn].set_xticks(np.arange(20,91,20))
+                    #axs[nn].set_yticks(np.arange(0,1,0.2))
+                    axs[nn].grid(True)
+                    handles, labels = axs[nn].get_legend_handles_labels()
+                    # these are matplotlib.patch.Patch properties
+                    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+                    # place a text box in upper left in axes coords
+                    axs[nn].text(0.95, 0.95, self.title[nn], transform=axs[nn].transAxes,
+                        verticalalignment='top', horizontalalignment='right', bbox=props)
+            fig.legend(handles, labels, loc = (0.135, .89), ncol = 5)#loc='upper center', ncol=5)
+            fig.add_subplot(111, frameon=False)
+            # hide tick and tick label of the big axis
+            plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
+            plt.xlabel("Nr. of instances labeled")
+            plt.ylabel("AUROC")
+            #plt.savefig("AUCROC.png",bbox_inches='tight')
+            #plt.legend()
+            plt.show()
+
+            
+            fig, axs = plt.subplots(1,2, sharex=True, sharey=True, figsize = (8,4))
+            fig.subplots_adjust(hspace=0.01, wspace=0.01)
+            for nn in range(len(self.name)):
+                names = []
+                countsaucroc = []
+                countsaucrocbag = []
+                aucroc = []
+                aucrocbag = []
+                directory = os.path.join(current, "results",self.name[nn])
+                import csv
+                for filename in os.listdir(directory):
+                    f = os.path.join(directory, filename)
+                    # checking if it is a file
+                    if os.path.isfile(f):
+                        with open(f, 'r') as readFile:
+                            reader = csv.reader(readFile)
+                            lines = list(reader)
+                            currentname = f.split("\\")[-1].split(".")[0]
+                            if len(names)> 0 and names[-1] == currentname:
+                                for line in lines:
+                                    if line[0] == "auc_roc":
+                                        aucroc[-1] = aucroc[-1] + np.asarray([float(ww) for ww in line[1:]], dtype = float)
+                                        countsaucroc[-1] += 1
+                                    if line[0] == "auc_roc_bag":
+                                        aucrocbag[-1] = aucrocbag[-1] + np.asarray([float(ww) for ww in line[1:]], dtype = float)
+                                        countsaucrocbag[-1] += 1
+                            else:
+                                names.append(f.split("\\")[-1].split(".")[0])
+                                for line in lines:
+                                    if line[0] == "auc_roc":
+                                        aucroc.append( np.asarray([float(ww) for ww in line[1:]], dtype = float))
+                                    if line[0] == "auc_roc_bag":
+                                        aucrocbag.append( np.asarray([float(ww) for ww in line[1:]], dtype = float))
+                                countsaucroc.append(1)
+                                countsaucrocbag.append(1)
+                todel = None
+                toput = None
+                for i in range(len(names)):
+                    if names[i] == "AlbaMethod":
+                        names[i] = "ALBA"
+                    if names[i] == "SmartInitialGuess":
+                        names[i] = "AMIB"
+                        toput = i
+                    if names[i] == "RandomSampling":
+                        names[i] = "Random Sampling"
+                    if names[i] == "BasicActiveLearning":
+                        names[i] = "Uncertainty Sampling"
+                    if names[i] == "WithoutAlignment":
+                        todel= i
+                if todel != None:
+                    names.pop(todel)
+                    countsaucroc.pop(todel)
+                    countsaucrocbag.pop(todel)
+                    aucroc.pop(todel)
+                    aucrocbag.pop(todel)
+                if toput > todel:
+                    toput -= 1
+                name = names.pop(toput)
+                names.insert(0,name)
+                score = countsaucroc.pop(toput)
+                countsaucroc.insert(0,score)
+                score = countsaucrocbag.pop(toput)
+                countsaucrocbag.insert(0,score)
+                score = aucroc.pop(toput)
+                aucroc.insert(0,score)
+                score = aucrocbag.pop(toput)
+                aucrocbag.insert(0,score)
+
+                if False:
+                    names.append("SIGEnsemble")
+                    countsaucrocbag.append(1)
+                    aucrocbag.append(np.zeros((0)))
+                    i = 0
+                    while names[i] != "SmartInitialGuess":
+                        i += 1 
+                    dummy = aucroc[i]
+                    fltr = np.ones((5))/5
+                    dummy = np.convolve(dummy,fltr, mode="same")
+                    print(dummy)
+                    aucroc.append(dummy)
+                    countsaucroc.append(countsaucroc[i])
+                colors = ["#d62728", "#2ca02c", "#ff7f0e","#1f77b4"]
+                for i in range(len(names)):
+                    if names[i] == "AMIB":
+                        axs[nn].plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i], label = names[i],linewidth=2.0, c= colors[i])
+                    else:
+                        axs[nn].plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i],"--", label = names[i], c= colors[i])
+                    axs[nn].set_ylim(0,1)
+                    axs[nn].set_xlim(0,100)
+                    #axs[nn].set_title(self.title[nn])
+                    axs[nn].set_xticks(np.arange(20,91,20))
+                    #axs[nn].set_yticks(np.arange(0,1,0.2))
+                    axs[nn].grid(True)
+                    handles, labels = axs[nn].get_legend_handles_labels()
+                    # these are matplotlib.patch.Patch properties
+                    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+                    # place a text box in upper left in axes coords
+                    axs[nn].text(0.95, 0.95, self.title[nn], transform=axs[nn].transAxes,
+                        verticalalignment='top', horizontalalignment='right', bbox=props)
+                    fig.legend(handles, labels, loc = (0.135, .89), ncol = 5)#loc='upper center', ncol=5)
+            fig.add_subplot(111, frameon=False)
+            # hide tick and tick label of the big axis
+            plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
+            plt.xlabel("Nr. of instances labeled")
+            plt.ylabel("Bag AUROC")
+            #plt.savefig("AUCROC.png",bbox_inches='tight')
+            #plt.legend()
             plt.show()
             return
 
@@ -228,6 +401,6 @@ class PlotPerformance:
             plt.close()
 
 if __name__=="__main__":
-    pp = PlotPerformance("2_annthyroid0")
+    pp = PlotPerformance(["29_Pima1", "47_Yeast1"],["Pima", "Yeast"])
     pp()
     #pp._fig()
