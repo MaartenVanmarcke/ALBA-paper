@@ -29,7 +29,7 @@ class PatchGAN(nn.Module):
                    nn.LeakyReLU(0.2, True)]
 
         layers += [nn.Linear(2*math.ceil(math.log2(args.features)),2),
-                   nn.LeakyReLU(0.2, True)]
+                   nn.Sigmoid()]
 
         self.model = nn.Sequential(*layers)
         init_model(self.model, init_method=args.initializer)
