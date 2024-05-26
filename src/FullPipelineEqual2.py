@@ -107,7 +107,7 @@ if __name__=="__main__":
     preprocessor = Preprocessor()
     query_budget = int(.25*2)
     query_budget = 5"""
-    methods = [SmartInitialGuessMethod(), AlbaMethod(), WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
+    methods = [AlbaMethod(),SmartInitialGuessMethod(),  WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
     pipeline = FullPipeline()
     plotPerformance = PlotPerformance()
     pipeline(inputDatas, constructBags, preprocessor, methods, plotPerformance, checker, saver)
