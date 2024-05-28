@@ -144,8 +144,6 @@ class ConstructBagsOpt:
 
     def _clusterNormals(self, normals,kk):
         ## Scaling before clustering needed?
-        scaler = StandardScaler()
-        normalstransf = scaler.fit_transform(normals)
 
         kmeans = KMeansConstrained(
                 n_clusters=self.nclusters,
@@ -153,7 +151,7 @@ class ConstructBagsOpt:
                 random_state=kk
             )
 
-        kmeans.fit(normalstransf)
+        kmeans.fit(normals)
         assignment = kmeans.labels_
 
         clusters = {}
@@ -181,6 +179,10 @@ class ConstructBagsOpt:
     
     def createBags(self, normals, anomalies,seed):
         np.random.seed(seed)
+        scaler = StandardScaler()
+        scaler = scaler.fit(np.concatenate((normals, anomalies)))
+        normals = scaler.transform(normals)
+        anomalies = scaler.transform(anomalies)
         clusters = self._clusterNormals(normals,seed)
         cluster_idxs = np.arange(0, self.nclusters)#np.random.randint(0,self.nclusters, size = (self.nbags))
         
