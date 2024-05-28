@@ -16,8 +16,6 @@ class ConstructBags:
 
     def _clusterNormals(self, normals,kk):
         ## Scaling before clustering needed?
-        scaler = StandardScaler()
-        normalstransf = scaler.fit_transform(normals)
 
         kmeans = KMeans(
             init="random", #"k-means++"
@@ -27,7 +25,7 @@ class ConstructBags:
             random_state=kk
         )
 
-        kmeans.fit(normalstransf)
+        kmeans.fit(normals)
         assignment = kmeans.labels_
 
         clusters = {}
@@ -55,6 +53,11 @@ class ConstructBags:
     
     def createBags(self, normals, anomalies,seed):
         np.random.seed(seed)
+        scaler = StandardScaler()
+        scaler = scaler.fit(np.concatenate((normals, anomalies)))
+        normals = scaler.transform(normals)
+        anomalies = scaler.transform(anomalies)
+
         clusters = self._clusterNormals(normals,seed)
         cluster_idxs = np.random.randint(0,self.nclusters, size = (self.nbags))
         
@@ -103,6 +106,10 @@ class ConstructBagsWithoutClustering:
     
     def createBags(self, normals, anomalies,seed):
         np.random.seed(seed)
+        scaler = StandardScaler()
+        scaler = scaler.fit(np.concatenate((normals, anomalies)))
+        normals = scaler.transform(normals)
+        anomalies = scaler.transform(anomalies)
         instanceIdxs = np.random.choice(normals.shape[0], size = (self.nbags, self.instances_per_bag), replace = False)
         
         bags = {}
