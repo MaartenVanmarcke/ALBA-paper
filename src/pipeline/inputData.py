@@ -56,14 +56,39 @@ class TestData(InputData):
     
 
 
-class Pima_29(InputData):
+class Waveform_41(InputData):
     
     def __init__(self) -> None:
-        name = "29_Pima"
+        name = "41_Waveform"
         super().__init__(name)
 
     def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','29_Pima.npz'), allow_pickle=True)
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','41_Waveform.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+    
+
+
+
+class Fault_12(InputData):
+    
+    def __init__(self) -> None:
+        name = "12_Fault"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','12_fault.npz'), allow_pickle=True)
         data, labels = data['X'], data['y']
         idxs = labels == 0
         self.normals = data[idxs, :]
@@ -81,7 +106,7 @@ class Pima_29(InputData):
 class Vowels_40(InputData):
     
     def __init__(self) -> None:
-        name = "40_vowels"
+        name = "40_Vowels"
         super().__init__(name)
 
     def loadData(self):
@@ -154,6 +179,7 @@ class Letter_20(InputData):
 class Cardio_6(InputData):
     
     def __init__(self) -> None:
+        raise Exception("Unused dataset!")
         name = "6_cardio"
         super().__init__(name)
 
@@ -178,7 +204,7 @@ class Cardio_6(InputData):
 class checkData(InputData):
     
     def __init__(self) -> None:
-        name = "29_Pima"
+        name = "25_musk"
         self.name = name 
         super().__init__(name)
 
@@ -188,6 +214,7 @@ class checkData(InputData):
         idxs = labels == 0
         self.normals = data[idxs, :]
         self.anomalies = data[np.invert(idxs), :]
+        print(self.getNumberOfFeatures())
     
     def getNumberOfInstances(self):
         return len(self.normals)+len(self.anomalies) # 4819
@@ -208,36 +235,14 @@ class checkData(InputData):
 #######################
 
 
-class Pima_29_Equal(InputData):
+class Letter_20_Equal(InputData):
     
     def __init__(self) -> None:
-        name = "29_Pima_equal_distr"
+        name = "20_Letter_equal_distr"
         super().__init__(name)
 
     def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','29_Pima.npz'), allow_pickle=True)
-        data, labels = data['X'], data['y']
-        idxs = labels == 0
-        self.normals = data[idxs, :]
-        self.anomalies = data[np.invert(idxs), :]
-    
-    def getNumberOfInstances(self):
-        return len(self.normals)+len(self.anomalies) # 4819
-    
-    def getNumberOfAnomalies(self):
-        return len(self.anomalies) # 257
-    
-    def getNumberOfFeatures(self):
-        return len(self.normals[0,:]) # 5
-
-class Vowels_40_Equal(InputData):
-    
-    def __init__(self) -> None:
-        name = "40_vowels_equal_distr"
-        super().__init__(name)
-
-    def loadData(self):
-        data = np.load(os.path.join(current, "src","pipeline",'adbench','40_vowels.npz'), allow_pickle=True)
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','20_letter.npz'), allow_pickle=True)
         data, labels = data['X'], data['y']
         idxs = labels == 0
         self.normals = data[idxs, :]
@@ -260,6 +265,29 @@ class Yeast_47_Equal(InputData):
 
     def loadData(self):
         data = np.load(os.path.join(current, "src","pipeline",'adbench','47_yeast.npz'), allow_pickle=True)
+        data, labels = data['X'], data['y']
+        idxs = labels == 0
+        self.normals = data[idxs, :]
+        self.anomalies = data[np.invert(idxs), :]
+    
+    def getNumberOfInstances(self):
+        return len(self.normals)+len(self.anomalies) # 4819
+    
+    def getNumberOfAnomalies(self):
+        return len(self.anomalies) # 257
+    
+    def getNumberOfFeatures(self):
+        return len(self.normals[0,:]) # 5
+    
+
+class Vowels_40_Equal(InputData):
+    
+    def __init__(self) -> None:
+        name = "40_vowels_equal_distr"
+        super().__init__(name)
+
+    def loadData(self):
+        data = np.load(os.path.join(current, "src","pipeline",'adbench','40_vowels.npz'), allow_pickle=True)
         data, labels = data['X'], data['y']
         idxs = labels == 0
         self.normals = data[idxs, :]

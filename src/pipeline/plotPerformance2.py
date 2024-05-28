@@ -401,6 +401,6 @@ class PlotPerformance:
             plt.close()
 
 if __name__=="__main__":
-    pp = PlotPerformance(["29_Pima1", "47_Yeast1"],["Pima", "Yeast"])
+    pp = PlotPerformance(["20_letter1", "6_cardio1"],["Letter", "Cardio"])
     pp()
     #pp._fig()

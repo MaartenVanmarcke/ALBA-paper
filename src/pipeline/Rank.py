@@ -131,7 +131,16 @@ class PlotPerformance:
             methods = [namesMethods["SmartInitialGuess"], namesMethods["RandomSampling"]]
             dummy = np.sum(namesMethods["SmartInitialGuess"]== np.argmax(aucroc[methods,:,:,:], axis = 0))
             print("RS", dummy, np.prod(aucroc[namesMethods["SmartInitialGuess"],:,:,:].shape),dummy/ np.prod(aucroc[namesMethods["SmartInitialGuess"],:,:,:].shape))
+            dummy =  np.divide(aucroc[namesMethods["SmartInitialGuess"],0,:,:], aucroc[namesMethods["AlbaMethod"],0,:,:])
+            print("ImprovementAligning", (np.mean(dummy) -1)*100)
             print("BAG LEVEL")
+            
+            """dummy = np.sum(namesMethods["SmartInitialGuess"]== np.argmax(aucrocbag[:,:,namesDatasets["29_Pima1"],:], axis = 0))
+            print("Overall Pima", dummy, np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,namesDatasets["29_Pima1"],:].shape),dummy/ np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,namesDatasets["29_Pima1"],:].shape))
+            dummy = np.sum(namesMethods["SmartInitialGuess"]== np.argmax(aucrocbag[:,:,namesDatasets["47_yeast1"],:], axis = 0))
+            print("Overall Yeast", dummy, np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,namesDatasets["47_yeast1"],:].shape),dummy/ np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,namesDatasets["47_yeast1"],:].shape))
+            """
+            
             dummy = np.sum(namesMethods["SmartInitialGuess"]== np.argmax(aucrocbag[:,:,:,:], axis = 0))
             print("Overall", dummy, np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,:,:].shape),dummy/ np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,:,:].shape))
             dummy = np.sum(namesMethods["SmartInitialGuess"]== np.argmax(aucrocbag[:,:,:,:], axis = 0))
@@ -146,6 +155,9 @@ class PlotPerformance:
             methods = [namesMethods["SmartInitialGuess"], namesMethods["RandomSampling"]]
             dummy = np.sum(namesMethods["SmartInitialGuess"]== np.argmax(aucrocbag[methods,:,:,:], axis = 0))
             print("RS", dummy, np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,:,:].shape),dummy/ np.prod(aucrocbag[namesMethods["SmartInitialGuess"],:,:,:].shape))
+            idxs = aucrocbag[namesMethods["AlbaMethod"],0,:,:] != 0
+            dummy =  np.divide(aucrocbag[namesMethods["SmartInitialGuess"],0,:,:][idxs], aucrocbag[namesMethods["AlbaMethod"],0,:,:][idxs])
+            print("ImprovementAligning", (np.mean(dummy) -1)*100)
             
 
             rankmean = np.around(rankmean, decimals=2)
@@ -372,7 +384,7 @@ class PlotPerformance:
             plt.close()
 
 if __name__=="__main__":
-    pp = PlotPerformance(["29_Pima1", "47_yeast1"],# "29_Pima_equal_distr1", "47_yeast_equal_distr1"]
+    pp = PlotPerformance(["29_Pima1", "47_yeast1"],#["29_Pima_equal_distr1", "47_yeast_equal_distr1"], #["29_Pima1", "47_yeast1"]
                          ["SmartInitialGuess",  "AlbaMethod","BasicActiveLearning", "RandomSampling"], 
                          4, 
                          20)

@@ -36,9 +36,13 @@ class FullPipeline:
                  *args: Any, **kwds: Any) -> Any:
         for inputData in inputDatas:
             normals = inputData.getNormals()
-            anomalies = inputData.getNormals()
+            anomalies = inputData.getAnomalies()
             seedcounter = 0
             query_budget = 100
+            passsssed = []
+            checkssss = []
+            check4 = 0
+            check4444 = []
             for i in range(1):
                 checkTime = 0
                 nr_passed = 0
@@ -48,25 +52,36 @@ class FullPipeline:
                 file.close() """  
                 bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies, seedcounter)
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
-                flag = checker(bags, bags_labels, X_inst, y_inst)
+                flag, flag2 = checker(bags, bags_labels, X_inst, y_inst)
                 seedcounter += 1
                 checkTime += 1
                 if flag: 
                     nr_passed += 1
-                while (checkTime<20):
+                    if flag2:
+                        check4 += 1
+                while (checkTime<100):
                     print("CHECKTIME:", checkTime, "\nPASSED:", nr_passed)
                     """file = open(p, mode = "w")
                     file.write(str(seedcounter))
                     file.close()  """  
                     bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,seedcounter)
                     bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
-                    flag = checker(bags, bags_labels, X_inst, y_inst)
+                    flag, flag2 = checker(bags, bags_labels, X_inst, y_inst)
                     seedcounter += 1
                     checkTime += 1
                     if flag: 
                         nr_passed += 1
+                        if flag2:
+                            check4 += 1
+                    if checkTime%20 == 0 or checkTime == 10:
+                        passsssed.append(nr_passed)
+                        checkssss.append(checkTime)
+                        check4444.append(check4)
                 print("CHECKTIME:", checkTime)
                 print("NR Passed:", nr_passed)
+                print("CHECKTIME:", checkssss)
+                print("NR Passed:", passsssed)
+                print("Check 4:", check4444)
                 return 
                 saver.addGlobalParam("seed", seedcounter)
                 for method in methods:

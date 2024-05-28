@@ -37,10 +37,10 @@ class FullPipeline:
                  *args: Any, **kwds: Any) -> Any:
         for inputData in inputDatas:
             normals = inputData.getNormals()
-            anomalies = inputData.getNormals()
+            anomalies = inputData.getAnomalies()
             seedcounter = 0
             query_budget = 100
-            for i in range(5):
+            for i in range(3):
                 """file = open(p, mode = "w")
                 file.write(str(i))
                 file.close() """  
@@ -100,7 +100,7 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [id.Vowels_40()]#[TestData()]
+    inputDatas = [id.Yeast_47()]#[TestData()]
     nclusters = 10
     instance_per_bag = 50
     nbags = 10

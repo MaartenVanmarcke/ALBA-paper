@@ -37,8 +37,8 @@ class AlbaMethod(Method):
     def __call__(self, dataname, query_budget, experimentnumber, bags, bags_labels, X_inst, y_inst, *args: Any, **kwds: Any) -> Any:
         self.method = MainMethod(versionname = self.name,
                                  original = True,
-                                 al_strategy= "entropy",
-                                 mabreward= "entropy",
+                                 al_strategy= "random",
+                                 mabreward= "cosine",
                                  load = False,
                                  query_budget = query_budget,
                                  restart = False,
