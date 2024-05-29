@@ -259,11 +259,10 @@ class MABMethod:
             all_probs[key] = probs[int(nl[key]):int(nl[key+1])].flatten()
             all_preds[key] = preds[int(nl[key]):int(nl[key+1])]
 
-        if self.iteration_ == 0:
-            for ID, cluster in self.armed_bandits.items():
-                k = cluster["domain"]
-                ixs = cluster["indices"]
-                self.arms[ID].update_reward(all_probs[k][ixs], all_preds[k][ixs],np.linalg.norm(train_data.get_domain(k)))
+        for ID, cluster in self.armed_bandits.items():
+            k = cluster["domain"]
+            ixs = cluster["indices"]
+            self.arms[ID].update_reward(all_probs[k][ixs], all_preds[k][ixs],np.linalg.norm(train_data.get_domain(k)))
 
         # get reward for the played arm last time
         # this can only start from the second round
@@ -272,9 +271,6 @@ class MABMethod:
             for ID, cluster in self.armed_bandits.items():
                 if last_labeled[0] == cluster["domain"]:
                     if last_labeled[1] in cluster["indices"]:
-                        k = cluster["domain"]
-                        ixs = cluster["indices"]
-                        self.arms[ID].update_reward(all_probs[k][ixs], all_preds[k][ixs],np.linalg.norm(train_data.get_domain(k)))
                         self.i = ID
                         break
             ## Tell from which cluster (arm) you have queried
