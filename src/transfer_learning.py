@@ -79,6 +79,7 @@ class NoTransferClassifier:
         if probabilities:
             scores = self.classifier.predict_proba(X)
             probabs = scores/self.classifier._threshold(prior = probs)
+            probabs = np.power(probabs,2)
             xx = 1-np.power(2, -probabs)
             return xx
         else:
