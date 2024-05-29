@@ -1,6 +1,6 @@
 ## inspiration from: https://realpython.com/k-means-clustering-python/
 
-from sklearn.cluster import KMeans
+#from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import warnings
@@ -15,9 +15,10 @@ class ConstructBags:
         self.bag_contfactor = bag_contfactor
 
     def _clusterNormals(self, normals,kk):
+        raise Exception("")
         ## Scaling before clustering needed?
 
-        kmeans = KMeans(
+        """kmeans = KMeans(
             init="random", #"k-means++"
             n_clusters=self.nclusters,
             #n_init = 10,
@@ -49,7 +50,7 @@ class ConstructBags:
         self.nclusters = len(clusters.keys())
         print("CLUSTERS:",self.nclusters)
 
-        return newClusters
+        return newClusters"""
     
     def createBags(self, normals, anomalies,seed):
         np.random.seed(seed)
