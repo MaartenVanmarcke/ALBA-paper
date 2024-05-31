@@ -35,11 +35,16 @@ class PlotPerformance:
             aucrocbagmean = np.zeros((len(self.methods),101,len(self.datasets)))
             aucrocbagstdev = np.zeros((len(self.methods),101,len(self.datasets)))
             rank = np.zeros((len(self.methods),101,len(self.datasets), self.count))
-            rankmean = np.zeros((len(self.methods),101,len(self.datasets)))
+            rankbag = np.zeros((len(self.methods),101,len(self.datasets), self.count))
+            """rankmean = np.zeros((len(self.methods),101,len(self.datasets)))
             rankstdev = np.zeros((len(self.methods),101,len(self.datasets)))
             rankbag = np.zeros((len(self.methods),101,len(self.datasets), self.count))
             rankbagmean = np.zeros((len(self.methods),101,len(self.datasets)))
-            rankbagstdev = np.zeros((len(self.methods),101,len(self.datasets)))
+            rankbagstdev = np.zeros((len(self.methods),101,len(self.datasets)))"""
+            rankmean = np.zeros((len(self.methods),101))
+            rankstdev = np.zeros((len(self.methods),101))
+            rankbagmean = np.zeros((len(self.methods),101))
+            rankbagstdev = np.zeros((len(self.methods),101))
             lastmethod = ""
             iteration = 0
             for nn in range(len(self.datasets)):
@@ -95,14 +100,14 @@ class PlotPerformance:
             
             
             ## calculate mean
-            rankmean[:,:,:] = np.mean(rank, axis = -1)
-            rankbagmean[:,:,:] = np.mean(rankbag, axis = -1)
+            rankmean[:,:] = np.mean(rank, axis = (2,3))
+            rankbagmean[:,:] = np.mean(rankbag, axis = (2,3))
             aucrocmean[:,:,:] = np.mean(aucroc, axis = -1)
             aucrocbagmean[:,:,:] = np.mean(aucrocbag, axis = -1)
 
             ## calculate variance
-            rankstdev[:,:,:] = np.std(rank, axis = -1)
-            rankbagstdev[:,:,:] = np.std(rankbag, axis = -1)
+            rankstdev[:,:] = np.std(rank, axis = (2,3))
+            rankbagstdev[:,:] = np.std(rankbag, axis = (2,3))
             aucrocstdev[:,:,:] = np.std(aucroc, axis = -1)
             aucrocbagstdev[:,:,:] = np.std(aucrocbag, axis = -1)
             
@@ -169,32 +174,46 @@ class PlotPerformance:
             aucrocstdev = np.around(aucrocstdev, decimals=2)
             aucrocbagstdev = np.around(aucrocbagstdev, decimals=2)
 
-            for dataset in namesDatasets.keys():
+            with open(os.path.join("ranks","totalRanks.csv"), 'w', newline="") as file:
+                csvwriter = csv.writer(file) # 2. create a csvwriter object
+                csvwriter.writerow(["method"] + list(www)) # 4. write the header
+                for i in range(len(self.methods)):
+                    row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(rankmean[i, xx], rankstdev[i, xx])]
+                    csvwriter.writerow([self.methods[i]] + row)
+
+            """for dataset in namesDatasets.keys():
                 with open(os.path.join("ranks",dataset+".csv"), 'w', newline="") as file:
                     csvwriter = csv.writer(file) # 2. create a csvwriter object
                     csvwriter.writerow(["method"] + list(www)) # 4. write the header
                     for i in range(len(self.methods)):
                         row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(rankmean[i, xx, namesDatasets[dataset]], rankstdev[i, xx, namesDatasets[dataset]])]
-                        csvwriter.writerow([self.methods[i]] + row)
+                        csvwriter.writerow([self.methods[i]] + row)"""
 
-            for dataset in namesDatasets.keys():
+            with open(os.path.join("ranksbag","totalRanksBag.csv"), 'w', newline="") as file:
+                csvwriter = csv.writer(file) # 2. create a csvwriter object
+                csvwriter.writerow(["method"] + list(www)) # 4. write the header
+                for i in range(len(self.methods)):
+                    row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(rankbagmean[i, xx], rankbagstdev[i, xx])]
+                    csvwriter.writerow([self.methods[i]] + row)
+            
+            """for dataset in namesDatasets.keys():
                 with open(os.path.join("ranksbag",dataset+".csv"), 'w', newline="") as file:
                     csvwriter = csv.writer(file) # 2. create a csvwriter object
                     csvwriter.writerow(["method"] + list(www)) # 4. write the header
                     for i in range(len(self.methods)):
                         row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(rankbagmean[i, xx, namesDatasets[dataset]], rankbagstdev[i, xx, namesDatasets[dataset]])]
-                        csvwriter.writerow([self.methods[i]] + row)
+                        csvwriter.writerow([self.methods[i]] + row)"""
                         
-                        
+            for dataset in namesDatasets.keys():            
                 with open(os.path.join("instancelevel",dataset+".csv"), 'w', newline="") as file:
                     csvwriter = csv.writer(file) # 2. create a csvwriter object
                     csvwriter.writerow(["method"] + list(www)) # 4. write the header
                     for i in range(len(self.methods)):
                         row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(aucrocmean[i, xx, namesDatasets[dataset]], aucrocstdev[i, xx, namesDatasets[dataset]])]
                         csvwriter.writerow([self.methods[i]] + row)
-                    for i in range(len(self.methods)):
+                    """for i in range(len(self.methods)):
                         row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(rankmean[i, xx, namesDatasets[dataset]], rankstdev[i, xx, namesDatasets[dataset]])]
-                        csvwriter.writerow([self.methods[i]] + row)
+                        csvwriter.writerow([self.methods[i]] + row)"""
                         
                 with open(os.path.join("baglevel",dataset+".csv"), 'w', newline="") as file:
                     csvwriter = csv.writer(file) # 2. create a csvwriter object
@@ -202,9 +221,9 @@ class PlotPerformance:
                     for i in range(len(self.methods)):
                         row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(aucrocbagmean[i, xx, namesDatasets[dataset]], aucrocbagstdev[i, xx, namesDatasets[dataset]])]
                         csvwriter.writerow([self.methods[i]] + row)
-                    for i in range(len(self.methods)):
+                    """for i in range(len(self.methods)):
                         row = ["{:.2f}".format(a)+ " + " + "{:.2f}".format(b) for a, b in zip(rankbagmean[i, xx, namesDatasets[dataset]], rankbagstdev[i, xx, namesDatasets[dataset]])]
-                        csvwriter.writerow([self.methods[i]] + row)
+                        csvwriter.writerow([self.methods[i]] + row)"""
 
                         
                         
@@ -384,9 +403,13 @@ class PlotPerformance:
             plt.close()
 
 if __name__=="__main__":
-    pp = PlotPerformance(["29_Pima1", "47_yeast1"],#["29_Pima_equal_distr1", "47_yeast_equal_distr1"], #["29_Pima1", "47_yeast1"]
+    """pp = PlotPerformance(["40_Vowels0", "47_yeast0","20_letter0","12_Fault0",   "41_Waveform0"],#["29_Pima_equal_distr1", "47_yeast_equal_distr1"], #["29_Pima1", "47_yeast1"]
                          ["SmartInitialGuess",  "AlbaMethod","BasicActiveLearning", "RandomSampling"], 
-                         4, 
+                         2, 
+                         20)"""
+    pp = PlotPerformance(["40_vowels_equal_distr0", "47_yeast_equal_distr0", "20_Letter_equal_distr0"],#["29_Pima_equal_distr1", "47_yeast_equal_distr1"], #["29_Pima1", "47_yeast1"]
+                         ["SmartInitialGuess",  "AlbaMethod","BasicActiveLearning", "RandomSampling"], 
+                         2, 
                          20)
     pp()
     #pp._fig()

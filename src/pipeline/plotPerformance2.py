@@ -19,8 +19,18 @@ class PlotPerformance:
         pass
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-            fig, axs = plt.subplots(1,2, sharex=True, sharey=True, figsize = (8,4))
-            fig.subplots_adjust(hspace=0.01, wspace=0.01)
+            if len(self.name)>3:
+                fig, axs = plt.subplots(2,3, sharex=True, sharey=True, figsize = (13,8))
+                fig.subplots_adjust(hspace=0.01, wspace=0.01)
+                axs[0][2].set_visible(False)
+                xaxs = [0,0,1,1,1]
+                yaxs = [0,1,0,1,2]
+            else:
+                fig, axs = plt.subplots(1,3, sharex=True, sharey=True, figsize = (13,4.5))
+                fig.subplots_adjust(hspace=0.01, wspace=0.01)
+                axs = [axs]
+                xaxs = [0,0,0]
+                yaxs = [0,1,2]
             for nn in range(len(self.name)):
                 names = []
                 countsaucroc = []
@@ -101,38 +111,51 @@ class PlotPerformance:
                     aucroc.append(dummy)
                     countsaucroc.append(countsaucroc[i])
                 colors = ["#d62728", "#2ca02c", "#ff7f0e","#1f77b4"]
+                ax = axs[xaxs[nn]][yaxs[nn]]
                 for i in range(len(names)):
                     if names[i] == "AMIB":
-                        axs[nn].plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i], label = names[i],linewidth=2.0, c= colors[i])
+                        ax.plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i], label = names[i],linewidth=2.0, c= colors[i])
                     else:
-                        axs[nn].plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i],"--", label = names[i], c= colors[i])
-                    axs[nn].set_ylim(0,1)
-                    axs[nn].set_xlim(0,100)
-                    #axs[nn].set_title(self.title[nn])
-                    axs[nn].set_xticks(np.arange(20,91,20))
-                    #axs[nn].set_yticks(np.arange(0,1,0.2))
-                    axs[nn].grid(True)
-                    handles, labels = axs[nn].get_legend_handles_labels()
+                        ax.plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i],"--", label = names[i], c= colors[i])
+                    ax.set_ylim(0,1)
+                    ax.set_xlim(0,100)
+                    #ax.set_title(self.title[nn])
+                    ax.set_xticks(np.arange(20,91,20))
+                    if len(self.name)>3:
+                        ax.set_yticks(np.arange(0.2,1,0.2))
+                    ax.grid(True)
+                    handles, labels = ax.get_legend_handles_labels()
                     # these are matplotlib.patch.Patch properties
                     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
                     # place a text box in upper left in axes coords
-                    axs[nn].text(0.95, 0.95, self.title[nn], transform=axs[nn].transAxes,
-                        verticalalignment='top', horizontalalignment='right', bbox=props)
-            fig.legend(handles, labels, loc = (0.135, .89), ncol = 5)#loc='upper center', ncol=5)
+                    ax.text(0.95, 0.05, self.title[nn], transform=ax.transAxes,
+                        verticalalignment='bottom', horizontalalignment='right', bbox=props, fontsize = 18)
+            fig.legend(handles, labels, loc = (0.12, .89), ncol = 5, fontsize = 17)#loc='upper center', ncol=5)
             fig.add_subplot(111, frameon=False)
             # hide tick and tick label of the big axis
             plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
-            plt.xlabel("Nr. of instances labeled")
-            plt.ylabel("AUROC")
+            plt.xlabel("Nr. of instances labeled", fontsize = 17)
+            plt.ylabel("AUROC", fontsize = 17)
             #plt.savefig("AUCROC.png",bbox_inches='tight')
             #plt.legend()
             plt.show()
 
             
-            fig, axs = plt.subplots(1,2, sharex=True, sharey=True, figsize = (8,4))
-            fig.subplots_adjust(hspace=0.01, wspace=0.01)
+            if len(self.name)>3:
+                fig, axs = plt.subplots(2,3, sharex=True, sharey=True, figsize = (13,8))
+                fig.subplots_adjust(hspace=0.01, wspace=0.01)
+                axs[0][2].set_visible(False)
+                xaxs = [0,0,1,1,1]
+                yaxs = [0,1,0,1,2]
+            else:
+                fig, axs = plt.subplots(1,3, sharex=True, sharey=True, figsize = (13,4.5))
+                fig.subplots_adjust(hspace=0.01, wspace=0.01)
+                axs = [axs]
+                xaxs = [0,0,0]
+                yaxs = [0,1,2]
             for nn in range(len(self.name)):
+                ax = axs[xaxs[nn]][yaxs[nn]]
                 names = []
                 countsaucroc = []
                 countsaucrocbag = []
@@ -140,6 +163,8 @@ class PlotPerformance:
                 aucrocbag = []
                 directory = os.path.join(current, "results",self.name[nn])
                 import csv
+                minim = 0
+                maxim = 1
                 for filename in os.listdir(directory):
                     f = os.path.join(directory, filename)
                     # checking if it is a file
@@ -214,28 +239,29 @@ class PlotPerformance:
                 colors = ["#d62728", "#2ca02c", "#ff7f0e","#1f77b4"]
                 for i in range(len(names)):
                     if names[i] == "AMIB":
-                        axs[nn].plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i], label = names[i],linewidth=2.0, c= colors[i])
+                        ax.plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i], label = names[i],linewidth=2.0, c= colors[i])
                     else:
-                        axs[nn].plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i],"--", label = names[i], c= colors[i])
-                    axs[nn].set_ylim(0,1)
-                    axs[nn].set_xlim(0,100)
-                    #axs[nn].set_title(self.title[nn])
-                    axs[nn].set_xticks(np.arange(20,91,20))
-                    #axs[nn].set_yticks(np.arange(0,1,0.2))
-                    axs[nn].grid(True)
-                    handles, labels = axs[nn].get_legend_handles_labels()
+                        ax.plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i],"--", label = names[i], c= colors[i])
+                    ax.set_ylim(0,1)
+                    ax.set_xlim(0,100)
+                    #ax.set_title(self.title[nn])
+                    ax.set_xticks(np.arange(20,91,20))
+                    if len(self.name)>3:
+                        ax.set_yticks(np.arange(0.2,1,0.2))
+                    ax.grid(True)
+                    handles, labels = ax.get_legend_handles_labels()
                     # these are matplotlib.patch.Patch properties
                     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
                     # place a text box in upper left in axes coords
-                    axs[nn].text(0.95, 0.95, self.title[nn], transform=axs[nn].transAxes,
-                        verticalalignment='top', horizontalalignment='right', bbox=props)
-                    fig.legend(handles, labels, loc = (0.135, .89), ncol = 5)#loc='upper center', ncol=5)
+                    ax.text(0.95, 0.05, self.title[nn], transform=ax.transAxes,
+                        verticalalignment='bottom', horizontalalignment='right', bbox=props, fontsize = 18)
+            fig.legend(handles, labels, loc = (0.12, .89), ncol = 5, fontsize = 17)#loc='upper center', ncol=5)
             fig.add_subplot(111, frameon=False)
             # hide tick and tick label of the big axis
             plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
-            plt.xlabel("Nr. of instances labeled")
-            plt.ylabel("Bag AUROC")
+            plt.xlabel("Nr. of instances labeled", fontsize = 17)
+            plt.ylabel("AUROC", fontsize = 17)
             #plt.savefig("AUCROC.png",bbox_inches='tight')
             #plt.legend()
             plt.show()
@@ -390,9 +416,9 @@ class PlotPerformance:
             #ax.set_yscale('log')
             ax.bar_label(rects, padding=3)
 
-            plt.title(title, fontsize = 17)
-            plt.xlabel(xlabel, fontsize = 14)
-            plt.ylabel(ylabel, fontsize = 14)
+            plt.title(title, fontsize = 20)
+            plt.xlabel(xlabel, fontsize = 16)
+            plt.ylabel(ylabel, fontsize = 16)
             plt.ylim([0,470])
             ax.set_xticks(xs, methodnames)
             plt.grid()
@@ -401,6 +427,7 @@ class PlotPerformance:
             plt.close()
 
 if __name__=="__main__":
-    pp = PlotPerformance(["20_letter1", "6_cardio1"],["Letter", "Cardio"])
+    #pp = PlotPerformance(["40_Vowels0", "47_yeast0","20_letter0","12_Fault0",   "41_Waveform0"],["Vowels", "Yeast", "Letter","Fault", "Waveform"])
+    pp = PlotPerformance(["40_vowels_equal_distr0", "47_yeast_equal_distr0", "20_Letter_equal_distr0"],["Vowels", "Yeast", "Letter"])
     pp()
     #pp._fig()
