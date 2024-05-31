@@ -43,50 +43,30 @@ class FullPipeline:
             checkssss = []
             check4 = 0
             check4444 = []
-            for i in range(1):
+            for i in range([6,37,38]):
                 checkTime = 0
                 nr_passed = 0
-                seedcounter =0
+                seedcounter =i
                 """file = open(p, mode = "w")
                 file.write(str(i))
                 file.close() """  
                 bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies, seedcounter)
                 bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
                 flag = checker(bags, bags_labels, X_inst, y_inst)
-                seedcounter += 1
                 checkTime += 1
                 if flag: 
                     nr_passed += 1
-                while (checkTime<100):
-                    print("CHECKTIME:", checkTime, "\nPASSED:", nr_passed)
-                    """file = open(p, mode = "w")
-                    file.write(str(seedcounter))
-                    file.close()  """  
-                    bags, bags_labels, y_inst = constructBags.createBags(normals, anomalies,seedcounter)
-                    bags, bags_labels, X_inst, y_inst = preprocessor.standardize(bags, bags_labels, y_inst)
-                    flag = checker(bags, bags_labels, X_inst, y_inst)
-                    seedcounter += 1
-                    checkTime += 1
-                    if flag: 
-                        nr_passed += 1
-                    if checkTime%20 == 0 or checkTime == 10:
-                        passsssed.append(nr_passed)
-                        checkssss.append(checkTime)
-                        check4444.append(check4)
                 print("CHECKTIME:", checkTime)
                 print("NR Passed:", nr_passed)
-                print("CHECKTIME:", checkssss)
-                print("NR Passed:", passsssed)
-                print("Check 4:", check4444)
-                return 
-                saver.addGlobalParam("seed", seedcounter)
-                for method in methods:
+            return 
+            saver.addGlobalParam("seed", seedcounter)
+            for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
                     end = time.time()
                     self.savetime(inputData.getName() + "."+ method.name, i, end-start)
                     saver(rewardInfo, current, inputData.getName(), method.name+"."+str(i), end-start, parameters= None)
-                seedcounter += 1
+            seedcounter += 1
         plotPerformance()
         print("Pipeline finished without noticeable errors. :D")
         return None
