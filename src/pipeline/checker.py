@@ -11,8 +11,8 @@ class Checker:
     def __call__(self, bags, bags_labels, X_inst, y_inst, *args: Any, **kwds: Any) -> Any:
         f1 = self.check1(bags, bags_labels, X_inst, y_inst)
         f2 = self.check2(bags, bags_labels, X_inst, y_inst)
-        f3 = self.check3(bags, bags_labels, X_inst, y_inst)
-        #f4 = self.check4(bags, bags_labels, X_inst, y_inst)
+        #f4= self.check3(bags, bags_labels, X_inst, y_inst)
+        f3 = self.check4(bags, bags_labels, X_inst, y_inst)
         if not np.all(np.array([f1,f2,f3])):
             return False
         return True
