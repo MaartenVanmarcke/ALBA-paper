@@ -77,15 +77,15 @@ class FullPipeline:
                 print("CHECKTIME:", checkssss)
                 print("NR Passed:", passsssed)
                 print("Check 4:", check4444)
-                return 
-                saver.addGlobalParam("seed", seedcounter)
-                for method in methods:
+            return 
+            saver.addGlobalParam("seed", seedcounter)
+            for method in methods:
                     start = time.time()
                     rewardInfo, current = method(inputData.getName(),query_budget, i, bags, bags_labels, X_inst, y_inst)
                     end = time.time()
                     self.savetime(inputData.getName() + "."+ method.name, i, end-start)
                     saver(rewardInfo, current, inputData.getName(), method.name+"."+str(i), end-start, parameters= None)
-                seedcounter += 1
+            seedcounter += 1
         plotPerformance()
         print("Pipeline finished without noticeable errors. :D")
         return None
