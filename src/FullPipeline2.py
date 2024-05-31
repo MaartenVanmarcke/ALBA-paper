@@ -38,9 +38,9 @@ class FullPipeline:
         for inputData in inputDatas:
             normals = inputData.getNormals()
             anomalies = inputData.getAnomalies()
-            seedcounter = 3
+            seedcounter = 5
             query_budget = 100
-            for i in range(3,5):
+            for i in [5]:
                 """file = open(p, mode = "w")
                 file.write(str(i))
                 file.close() """  
