@@ -111,7 +111,7 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [id.Waveform_41()]#[TestData()]
+    inputDatas = [id.Letter_20()]#[TestData()]
     nclusters = 10
     instance_per_bag = 50
     nbags = 10
