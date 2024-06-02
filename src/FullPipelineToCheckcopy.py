@@ -69,12 +69,13 @@ class FullPipeline:
                     checkTime += 1
                     if flag: 
                         nr_passed += 1
-                    if checkTime%20 == 0 or checkTime == 10:
+                    if checkTime%20 == 0 or checkTime == 10 or checkTime == 50:
                         passsssed.append(nr_passed)
                         checkssss.append(checkTime)
                         check4444.append(check4)
                 print("CHECKTIME:", checkTime)
                 print("NR Passed:", nr_passed)
+                print([str(i) for i in [0,10,20,40,50,60,80,100]])
                 print("CHECKTIME:", checkssss)
                 print("NR Passed:", passsssed)
                 print("Check 4:", check4444)
@@ -111,7 +112,7 @@ class FullPipeline:
             writer.writerows(lines)
 
 if __name__=="__main__":
-    inputDatas = [id.Waveform_41()]#[TestData()]
+    inputDatas = [id.checkData()]#[TestData()]
     nclusters = 10
     instance_per_bag = 50
     nbags = 10
