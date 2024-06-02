@@ -43,7 +43,7 @@ class FullPipeline:
             checkssss = []
             check4 = 0
             check4444 = []
-            for i in ([17,19,26]):
+            for i in ([17,19,26,28,31]):
                 checkTime = 0
                 nr_passed = 0
                 seedcounter =i
