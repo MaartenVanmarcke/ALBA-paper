@@ -138,6 +138,33 @@ class MainMethodFlattened():
             rewardInfo.updateAuc("rocbag", scorerocBag)
             rewardInfo.updateAuc("prbag", scoreprBag)
             
+            with open(os.path.join("probs", str(versionname)+".csv"), 'a') as f_object:
+ 
+                # Pass this file object to csv.writer()
+                # and get a writer object
+                writer_object = csv.writer(f_object)
+            
+                # Pass the list as an argument into
+                # the writerow()
+                writer_object.writerow([t] + list(prs))
+            
+                # Close the file object
+                f_object.close()
+
+            with open(os.path.join("bagprobs", str(versionname)+".csv"), 'a') as f_object:
+ 
+                # Pass this file object to csv.writer()
+                # and get a writer object
+                writer_object = csv.writer(f_object)
+            
+                # Pass the list as an argument into
+                # the writerow()
+                writer_object.writerow([t] + list(bagprobs))
+            
+                # Close the file object
+                f_object.close()
+
+
             if bags[0].shape[1] == 2:
                 self.pplot(bags,probabilities, weights, instance, dataBag, t, scoreroc, scorepr, scorerocBag, scoreprBag)
 
