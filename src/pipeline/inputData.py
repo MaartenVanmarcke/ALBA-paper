@@ -204,7 +204,7 @@ class Cardio_6(InputData):
 class checkData(InputData):
     
     def __init__(self) -> None:
-        name = "7_Cardiotocography"
+        name = "25_musk"
         self.name = name 
         super().__init__(name)
 
