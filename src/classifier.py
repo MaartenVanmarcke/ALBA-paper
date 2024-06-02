@@ -91,7 +91,7 @@ class Classifier:
         # Isolation Forest prior
         # TODO: random_state=i
         if prior == "IF":
-            prior = IForestWrap(n_estimators=200, contamination=self.c_, random_state = np.random.randint(0,10000))
+            prior = IForestWrap(n_estimators=200, contamination=self.c_, random_state = 0)
             prior.fit(X)
             ss = prior.decision_function(X)
             self.minim, self.maxim = np.min(ss), np.max(ss)
