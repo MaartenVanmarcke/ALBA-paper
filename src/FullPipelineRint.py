@@ -39,6 +39,7 @@ class FullPipeline:
         inputDatas = [id.Yeast_47(), id.Fault_12(), id.Letter_20(), id.Vowels_40(), id.Waveform_41()]
         for i in range(len(inputDatas)):
             inputData = inputDatas[i]
+            print(inputData.getName())
             normals = inputData.getNormals()
             anomalies = inputData.getAnomalies()
             seedcounter = 5
