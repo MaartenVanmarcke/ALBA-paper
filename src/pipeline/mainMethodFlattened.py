@@ -12,6 +12,7 @@ file.close()
 np.random.seed(seed)
 import matplotlib
 import matplotlib.pyplot as plt
+import csv
 
 class MainMethodFlattened():
     def __init__(self,
