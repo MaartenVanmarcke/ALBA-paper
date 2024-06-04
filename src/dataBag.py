@@ -62,7 +62,7 @@ class DataBag:
         bag = 0
         while bag < len(self.bags):
             idx = 0
-            while idx < len(self.bags(bag)):
+            while idx < len(self.bags[bag]):
                 if idx == fullIdx:
                     return bag, idx
                 fullIdx -= 1
