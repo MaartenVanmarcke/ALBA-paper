@@ -50,7 +50,8 @@ class Saver():
                     writer.writerow(["Prob contr bag "+str(k)]+probContr[k])
                     writer.writerow(["Align contr bag "+str(k)]+alignContr[k])
             ddd = rewardInfo.getAllChosenArms()
+            print(ddd)
             for k,v in ddd:
-                    writer.writerow(["ChosenTimes "+str(k)]+v)
+                writer.writerow(["ChosenTimes "+str(k)]+v)
             writer.writerows(self.globalParams + parameters)
         return None
