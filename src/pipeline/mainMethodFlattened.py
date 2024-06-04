@@ -247,7 +247,7 @@ class MainMethodFlattened():
                 while dataBag.isLabeled(key,idx):
                     i+=1
                     key, idx = queries[i]
-                    
+                print("key, idx", key, idx)
                 rewardInfo.chooseArm(key)
                 key,idx = queries[i]
                 instance = training_data.get_domain(key)[idx]
