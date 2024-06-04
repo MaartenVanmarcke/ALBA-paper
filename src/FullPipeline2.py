@@ -40,7 +40,7 @@ class FullPipeline:
             anomalies = inputData.getAnomalies()
             seedcounter = 0
             query_budget = 100
-            for i in [7]:
+            for i in range(5):
                 """file = open(p, mode = "w")
                 file.write(str(i))
                 file.close() """  
@@ -120,7 +120,7 @@ if __name__=="__main__":
     preprocessor = Preprocessor()
     query_budget = int(.25*2)
     query_budget = 5"""
-    methods = [ WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#AlbaMethod(), SmartInitialGuessMethod(),SmartInitialGuessMethod()#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
+    methods = [ ActiveLearning(),RandomSampling()]#AlbaMethod(), SmartInitialGuessMethod(),SmartInitialGuessMethod()#,SmartInitialGuessMethod(),WithoutAlignmentMethod(),ActiveLearning(),RandomSampling()]#,WithAlignmentMethod() SmartInitialGuessMethod(), AlbaMethod(), ActiveLearning(), RandomSampling()]
     pipeline = FullPipeline()
     plotPerformance = PlotPerformance()
     pipeline(inputDatas, constructBags, preprocessor, methods, plotPerformance, checker, saver)
