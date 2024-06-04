@@ -247,7 +247,6 @@ class MainMethodFlattened():
                 while dataBag.isLabeled(key,idx):
                     i+=1
                     key, idx = queries[i]
-                print("key, idx", key, idx)
                 rewardInfo.chooseArm(key)
                 key,idx = queries[i]
                 instance = training_data.get_domain(key)[idx]
@@ -257,7 +256,6 @@ class MainMethodFlattened():
                 dataBag.label(key,idx)
 
                 bb,ii = dataBag.findBagIdx(dataBag.findFullIdx(key,idx))
-                print(bb,ii)
                 rewardInfo.chooseArm2(bb)
 
                 if (lbl == 1):

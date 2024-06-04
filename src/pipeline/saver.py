@@ -44,7 +44,7 @@ class Saver():
             writer.writerows([["Date", date.today()],
                               ["Time", time]] + self.localParams)
             for k, v in rewards.items():
-                writer.writerow(["Rewards bag "+str(k)]+v)
+                writer.writerow(["Rewards bXagX "+str(k)]+v)
             if len(probContr[0])>0:
                 for k in probContr.keys():
                     writer.writerow(["Prob contr bag "+str(k)]+probContr[k])
@@ -52,6 +52,6 @@ class Saver():
             ddd = rewardInfo.getAllChosenArms2()
             print(ddd)
             for k,v in ddd.items():
-                writer.writerow(["ChosenTimes "+str(k)]+v)
+                writer.writerow(["Rewards bag "+str(k)]+v)
             writer.writerows(self.globalParams + parameters)
         return None

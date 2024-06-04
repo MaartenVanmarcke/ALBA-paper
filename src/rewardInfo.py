@@ -134,7 +134,6 @@ class RewardInfo:
                 self.chosenArms[key].append(cnt)
 
     def chooseArm2(self, bag):
-        print(self.chosenArms2)
         for key in self.chosenArms2.keys():
             cnt = self.chosenArms2[key][-1]
             if key == bag:
