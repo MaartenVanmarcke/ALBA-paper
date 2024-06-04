@@ -35,16 +35,21 @@ class FullPipeline:
                  checker,#: Checker,
                  saver,#:Saver,
                  *args: Any, **kwds: Any) -> Any:
-        xx = [0,11,16,5,27]
+        xx = np.array([[0,2,3,4,5],
+                       [12,14,19,23,26],
+                       [17,19,26,28,31],
+                       [6,37,38,52,59],
+                       [28,44,46,51,52]])
         inputDatas = [id.Yeast_47(), id.Fault_12(), id.Letter_20(), id.Vowels_40(), id.Waveform_41()]
-        for i in range(len(inputDatas)):
-            inputData = inputDatas[i]
+        for mm in range(len(inputDatas)):
+            inputData = inputDatas[mm]
             print(inputData.getName())
             normals = inputData.getNormals()
             anomalies = inputData.getAnomalies()
-            seedcounter = xx[i]
+            
             query_budget = 100
-            for i in [30]:
+            for i in [100,101,102,103,104]:
+                seedcounter = xx[mm,i-100]
                 """file = open(p, mode = "w")
                 file.write(str(i))
                 file.close() """  
@@ -75,7 +80,7 @@ class FullPipeline:
                 
                 
             
-                with open(os.path.join("rints", str(inputData.getName()) +".csv"), 'a') as f_object:
+                with open(os.path.join("rints", str(inputData.getName()) +"."+str(i-100)+".csv"), 'w') as f_object:
     
                     # Pass this file object to csv.writer()
                     # and get a writer object
@@ -88,7 +93,7 @@ class FullPipeline:
                     # Close the file object
                     f_object.close()
 
-                with open(os.path.join("rinstBags", str(inputData.getName()) + ".csv"), 'a') as f_object:
+                with open(os.path.join("rinstBags", str(inputData.getName()) + ".csv"), 'w') as f_object:
     
                     # Pass this file object to csv.writer()
                     # and get a writer object
