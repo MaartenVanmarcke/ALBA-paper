@@ -58,6 +58,18 @@ class DataBag:
             k += 1
         return (index+idx)
     
+    def findBagIdx(self, fullIdx):
+        bag = 0
+        while bag < len(self.bags):
+            idx = 0
+            while idx < len(self.bags(bag)):
+                if idx == fullIdx:
+                    return bag, idx
+                fullIdx -= 1
+                idx += 1
+            bag += 1
+        raise Exception("Bag/Idx not found: "+str(bag)+" "+str(idx)+" "+str(fullIdx))
+    
     def label(self, bag, idx):
         self.labeled[self.findFullIdx(bag, idx)] = -2
 

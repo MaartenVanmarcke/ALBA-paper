@@ -255,6 +255,10 @@ class MainMethodFlattened():
                 training_data.set_new_label(key, idx, lbl)
                 training_data.set_last_labeled(key,idx)
                 dataBag.label(key,idx)
+
+                bb,ii = dataBag.findBagIdx(dataBag.findFullIdx(key,idx))
+                rewardInfo.chooseArm2(bb)
+
                 if (lbl == 1):
                     labeledPos[key].append(instance.tolist())
                 else:

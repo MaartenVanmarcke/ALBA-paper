@@ -38,6 +38,9 @@ class RewardInfo:
         self.chosenArms = {}
         for bag in range(nbags):
             self.chosenArms[bag] = [0]
+        self.chosenArms2 = {}
+        for bag in range(10):
+            self.chosenArms2[bag] = [0]
 
         self.inRoundRobin = True
         self.RoundRobinEndIteration = -1
@@ -128,9 +131,19 @@ class RewardInfo:
                 self.chosenArms[key].append(cnt+1)
             else:
                 self.chosenArms[key].append(cnt)
+
+    def chooseArm2(self, bag):
+        for key in self.chosenArms2.keys():
+            cnt = self.chosenArms2[key][-1]
+            if key == bag:
+                self.chosenArms2[key].append(cnt+1)
+            else:
+                self.chosenArms2[key].append(cnt)
     
     def getChosenArm(self, bag):
         return self.chosenArms[bag]
     
     def getAllChosenArms(self):
         return self.chosenArms
+    def getAllChosenArms2(self):
+        return self.chosenArms2
