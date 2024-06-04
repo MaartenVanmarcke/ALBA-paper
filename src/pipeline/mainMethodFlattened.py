@@ -257,6 +257,7 @@ class MainMethodFlattened():
                 dataBag.label(key,idx)
 
                 bb,ii = dataBag.findBagIdx(dataBag.findFullIdx(key,idx))
+                print(bb,ii)
                 rewardInfo.chooseArm2(bb)
 
                 if (lbl == 1):
