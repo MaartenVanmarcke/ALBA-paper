@@ -88,12 +88,12 @@ class FullPipeline:
                 
                     # Pass the list as an argument into
                     # the writerow()
-                    writer_object.writerow([i] + list(np.rint(y_inst)))
+                    writer_object.writerow([i-100] + list(np.rint(y_inst)))
                 
                     # Close the file object
                     f_object.close()
 
-                with open(os.path.join("rinstBags", str(inputData.getName()) + ".csv"), 'w') as f_object:
+                with open(os.path.join("rinstBags", str(inputData.getName()) +"."+str(i-100)+ ".csv"), 'w') as f_object:
     
                     # Pass this file object to csv.writer()
                     # and get a writer object
@@ -101,7 +101,7 @@ class FullPipeline:
                 
                     # Pass the list as an argument into
                     # the writerow()
-                    writer_object.writerow([i] + list(np.rint(bags_labels)))
+                    writer_object.writerow([i-100] + list(np.rint(bags_labels)))
                 
                     # Close the file object
                     f_object.close()
