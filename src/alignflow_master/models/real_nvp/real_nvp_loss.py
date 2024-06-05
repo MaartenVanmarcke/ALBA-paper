@@ -32,10 +32,12 @@ class RealNVPLoss(nn.Module):
         if weights == None:
             nll = -ll.mean()
         else:
-            weights = 1.-weights
-            ll = ll*weights
+            newWeights = torch.zeros_like(weights)
+            newWeights[weights<=.5] = weights[weights<= .5]
+            newWeights = 1.-newWeights
+            ll = ll*newWeights
             nll = -ll.sum()
-            nrm = weights.sum()
+            nrm = newWeights.sum()
             if nrm == 0:
                 return 0*nll
             else:
@@ -55,9 +57,11 @@ class RealNVPLoss(nn.Module):
         if weights == None:
             nll = 0*ll.sum()
         else:
-            ll = ll*weights
+            newWeights = torch.zeros_like(weights)
+            newWeights[weights>=.5] = weights[weights>= .5]
+            ll = ll*newWeights
             nll = -ll.sum()
-            nrm = weights.sum()
+            nrm = newWeights.sum()
             if nrm == 0:
                 return 0*nll
             else:

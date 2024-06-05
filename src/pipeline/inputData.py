@@ -38,7 +38,7 @@ class InputData:
     
 class TestData(InputData):
     def __init__(self) -> None:
-        name = "TestData"
+        name = "TestDataNew"
         super().__init__(name)
 
     def loadData(self):
@@ -59,7 +59,7 @@ class TestData(InputData):
 class Waveform_41(InputData):
     
     def __init__(self) -> None:
-        name = "41_Waveform"
+        name = "41_WaveformNew"
         super().__init__(name)
 
     def loadData(self):
@@ -84,7 +84,7 @@ class Waveform_41(InputData):
 class Fault_12(InputData):
     
     def __init__(self) -> None:
-        name = "12_Fault"
+        name = "12_FaultNew"
         super().__init__(name)
 
     def loadData(self):
@@ -106,7 +106,7 @@ class Fault_12(InputData):
 class Vowels_40(InputData):
     
     def __init__(self) -> None:
-        name = "40_Vowels"
+        name = "40_VowelsNew"
         super().__init__(name)
 
     def loadData(self):
@@ -128,7 +128,7 @@ class Vowels_40(InputData):
 class Yeast_47(InputData):
     
     def __init__(self) -> None:
-        name = "47_yeast"
+        name = "47_yeastNew"
         super().__init__(name)
 
     def loadData(self):
@@ -157,7 +157,7 @@ class Yeast_47(InputData):
 class Letter_20(InputData):
     
     def __init__(self) -> None:
-        name = "20_letter"
+        name = "20_letterNew"
         super().__init__(name)
 
     def loadData(self):
@@ -180,7 +180,7 @@ class Cardio_6(InputData):
     
     def __init__(self) -> None:
         raise Exception("Unused dataset!")
-        name = "6_cardio"
+        name = "6_cardioNew"
         super().__init__(name)
 
     def loadData(self):
@@ -204,7 +204,7 @@ class Cardio_6(InputData):
 class checkData(InputData):
     
     def __init__(self) -> None:
-        name = "41_Waveform"
+        name = "41_WaveformNew"
         self.name = name 
         super().__init__(name)
 
@@ -238,7 +238,7 @@ class checkData(InputData):
 class Letter_20_Equal(InputData):
     
     def __init__(self) -> None:
-        name = "20_Letter_equal_distr"
+        name = "20_Letter_equal_distrNew"
         super().__init__(name)
 
     def loadData(self):
@@ -260,7 +260,7 @@ class Letter_20_Equal(InputData):
 class Yeast_47_Equal(InputData):
     
     def __init__(self) -> None:
-        name = "47_yeast_equal_distr"
+        name = "47_yeast_equal_distrNew"
         super().__init__(name)
 
     def loadData(self):
@@ -283,7 +283,7 @@ class Yeast_47_Equal(InputData):
 class Vowels_40_Equal(InputData):
     
     def __init__(self) -> None:
-        name = "40_vowels_equal_distr"
+        name = "40_vowels_equal_distrNew"
         super().__init__(name)
 
     def loadData(self):

@@ -40,7 +40,7 @@ class FullPipeline:
             anomalies = inputData.getAnomalies()
             seedcounters = [12,14,19,23,26]
             query_budget = 100
-            for i in range(5):
+            for i in range(1):
                 seedcounter = seedcounters[i]
                 """file = open(p, mode = "w")
                 file.write(str(i))
