@@ -29,11 +29,18 @@ class RealNVPLoss(nn.Module):
         prior_ll = -0.5 * (z ** 2 + np.log(2 * np.pi))
         prior_ll = prior_ll.view(z.size(0), -1).sum(-1)
         ll = prior_ll + sldj
+
+        if weights == None:
+            return -ll.mean()
+        weights = 1-weights
+        ll = ll*weights
+        return -ll.sum()       
+     
         if weights == None:
             nll = -ll.mean()
         else:
-            newWeights = torch.zeros_like(weights)
-            newWeights[weights<=.5] = weights[weights<= .5]
+            #newWeights = torch.zeros_like(weights)
+            #newWeights[weights<=.5] = weights[weights<= .5]
             newWeights = 1.-newWeights
             ll = ll*newWeights
             nll = -ll.sum()
@@ -54,6 +61,12 @@ class RealNVPLoss(nn.Module):
         prior_ll = prior_ll - np.log(2*np.pi) - np.log(V/(2*np.pi)-1)
 
         ll = prior_ll + sldj
+        
+        if weights == None:
+            return -ll.mean()
+        ll = ll*weights
+        return -ll.sum()     
+    
         if weights == None:
             nll = 0*ll.sum()
         else:

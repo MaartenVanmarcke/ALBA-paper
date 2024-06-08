@@ -28,7 +28,7 @@ class PatchGAN(nn.Module):
         layers += [nn.Linear(3*math.ceil(math.log2(args.features)),2*math.ceil(math.log2(args.features))),
                    nn.LeakyReLU(0.2, True)]
 
-        layers += [nn.Linear(2*math.ceil(math.log2(args.features)),2),
+        layers += [nn.Linear(2*math.ceil(math.log2(args.features)),1),
                    nn.Sigmoid()]
 
         self.model = nn.Sequential(*layers)
