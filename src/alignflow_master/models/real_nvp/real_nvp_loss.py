@@ -25,22 +25,25 @@ class RealNVPLoss(nn.Module):
         else:
             return self.lossNormals(z, sldj, weights) + self.lossAnomalies(z, sldj, weights)#*10
     
+    def _unc(self, weights):
+        unc = -weights*torch.log2(weights)-(1-weights)*torch.log2(1-weights)
+        return unc[weights<.5], unc[weights>.5]
+
     def lossNormals(self, z, sldj, weights = None):
         prior_ll = -0.5 * (z ** 2 + np.log(2 * np.pi))
         prior_ll = prior_ll.view(z.size(0), -1).sum(-1)
         ll = prior_ll + sldj
 
-        if weights == None:
-            return -ll.mean()
-        weights = 1-weights
+        """weights = 1-weights
         ll = ll*weights
-        return -ll.sum()       
+        return -ll.sum() """      
      
         if weights == None:
             nll = -ll.mean()
         else:
             #newWeights = torch.zeros_like(weights)
             #newWeights[weights<=.5] = weights[weights<= .5]
+            newWeights = weights
             newWeights = 1.-newWeights
             ll = ll*newWeights
             nll = -ll.sum()
@@ -62,23 +65,30 @@ class RealNVPLoss(nn.Module):
 
         ll = prior_ll + sldj
         
-        if weights == None:
-            return -ll.mean()
-        ll = ll*weights
-        return -ll.sum()     
+        """if weights == None:
+            return -ll.mean()"""
+        Uneg, Upos = self._unc(weights)
+        """ll = ll*weights
+        res = -ll.sum()"""
+        Uneg = Uneg.sum()
+        Upos = Upos.sum()    
     
         if weights == None:
             nll = 0*ll.sum()
         else:
-            newWeights = torch.zeros_like(weights)
-            newWeights[weights>=.5] = weights[weights>= .5]
+            """newWeights = torch.zeros_like(weights)
+            newWeights[weights>=.5] = weights[weights>= .5]"""
+            newWeights = weights
             ll = ll*newWeights
             nll = -ll.sum()
             nrm = newWeights.sum()
             if nrm == 0:
                 return 0*nll
             else:
-                return nll/nrm
+                res = nll/nrm
+                res = res*Uneg
+                res = res/(Uneg+Upos)
+                return res
                 
         return nll
 
