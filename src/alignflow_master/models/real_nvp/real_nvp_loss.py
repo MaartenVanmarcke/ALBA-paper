@@ -27,6 +27,8 @@ class RealNVPLoss(nn.Module):
     
     def _unc(self, weights):
         unc = -weights*torch.log2(weights)-(1-weights)*torch.log2(1-weights)
+        unc[weights == 0] = 0
+        unc[weights == 1] = 1
         return unc[weights<.5], unc[weights>.5]
 
     def lossNormals(self, z, sldj, weights = None):
