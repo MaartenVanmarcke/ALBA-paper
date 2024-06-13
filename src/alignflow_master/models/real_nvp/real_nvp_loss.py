@@ -48,6 +48,7 @@ class RealNVPLoss(nn.Module):
             newWeights[weights>=.5] = weights[weights>= .5]
             ll = ll*newWeights
             nll = -ll.sum()
+            return nll
             nrm = newWeights.sum()
             if nrm == 0:
                 return 0*nll
@@ -81,6 +82,7 @@ class RealNVPLoss(nn.Module):
             newWeights[weights>=.5] = weights[weights>= .5]
             ll = ll*newWeights
             nll = -ll.sum()
+            return nll
             nrm = newWeights.sum()
             if nrm == 0:
                 return 0*nll
