@@ -44,9 +44,10 @@ class RealNVPLoss(nn.Module):
         if weights == None:
             nll = -ll.mean()
         else:
-            newWeights = torch.zeros_like(weights)
+            """newWeights = torch.zeros_like(weights)
             newWeights[weights>=.5] = weights[weights>= .5]
-            ll = ll*newWeights
+            ll = ll*newWeights"""
+            ll = ll*weights
             nll = -ll.sum()
             return nll
             nrm = newWeights.sum()
@@ -69,18 +70,18 @@ class RealNVPLoss(nn.Module):
         
         """if weights == None:
             return -ll.mean()"""
-        Uneg, Upos = self._unc(weights)
+        #Uneg, Upos = self._unc(weights)
         """ll = ll*weights
         res = -ll.sum()"""
-        Uneg = Uneg.sum()
-        Upos = Upos.sum()    
+        """Uneg = Uneg.sum()
+        Upos = Upos.sum() """   
     
         if weights == None:
             nll = 0*ll.sum()
         else:
-            newWeights = torch.zeros_like(weights)
-            newWeights[weights>=.5] = weights[weights>= .5]
-            ll = ll*newWeights
+            """newWeights = torch.zeros_like(weights)
+            newWeights[weights>=.5] = weights[weights>= .5]"""
+            ll = ll*weights
             nll = -ll.sum()
             return nll
             nrm = newWeights.sum()
