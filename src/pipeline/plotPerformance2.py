@@ -427,7 +427,7 @@ class PlotPerformance:
             plt.close()
 
 if __name__=="__main__":
-    #pp = PlotPerformance(["40_Vowels0", "47_yeast0","20_letter0","12_Fault0",   "41_Waveform0"],["Vowels", "Yeast", "Letter","Fault", "Waveform"])
-    pp = PlotPerformance(["40_vowels_equal_distr0", "47_yeast_equal_distr0", "20_Letter_equal_distr0"],["Vowels", "Yeast", "Letter"])
+    #pp = PlotPerformance(["47_yeast0", "47_yeast0","47_yeast0","47_yeast0",   "47_yeast0"],["Vowels", "Yeast", "Letter","Fault", "Waveform"])
+    pp = PlotPerformance(["47_yeastNew0","47_yeastNew1","47_yeastNew2", '47_yeastNew3', '47_yeastNew5'],["A","B","C", "D", "E"])
     pp()
     #pp._fig()
