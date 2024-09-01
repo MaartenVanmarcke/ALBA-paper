@@ -117,12 +117,12 @@ class PlotPerformance:
                         ax.plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i], label = names[i],linewidth=2.0, c= colors[i])
                     else:
                         ax.plot(np.arange(0,len(aucroc[i])),aucroc[i]/countsaucroc[i],"--", label = names[i], c= colors[i])
-                    ax.set_ylim(0,1)
+                    ax.set_ylim(0.3,1)
                     ax.set_xlim(0,100)
                     #ax.set_title(self.title[nn])
                     ax.set_xticks(np.arange(20,91,20))
                     if len(self.name)>3:
-                        ax.set_yticks(np.arange(0.2,1,0.2))
+                        ax.set_yticks(np.arange(0.4,1,0.1))
                     ax.grid(True)
                     handles, labels = ax.get_legend_handles_labels()
                     # these are matplotlib.patch.Patch properties
@@ -242,12 +242,12 @@ class PlotPerformance:
                         ax.plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i], label = names[i],linewidth=2.0, c= colors[i])
                     else:
                         ax.plot(np.arange(0,len(aucrocbag[i])),aucrocbag[i]/countsaucrocbag[i],"--", label = names[i], c= colors[i])
-                    ax.set_ylim(0,1)
+                    ax.set_ylim(0.3,1)
                     ax.set_xlim(0,100)
                     #ax.set_title(self.title[nn])
                     ax.set_xticks(np.arange(20,91,20))
                     if len(self.name)>3:
-                        ax.set_yticks(np.arange(0.2,1,0.2))
+                        ax.set_yticks(np.arange(0.4,1,0.1))
                     ax.grid(True)
                     handles, labels = ax.get_legend_handles_labels()
                     # these are matplotlib.patch.Patch properties
@@ -428,6 +428,8 @@ class PlotPerformance:
 
 if __name__=="__main__":
     #pp = PlotPerformance(["47_yeast0", "47_yeast0","47_yeast0","47_yeast0",   "47_yeast0"],["Vowels", "Yeast", "Letter","Fault", "Waveform"])
-    pp = PlotPerformance(["47_yeastNew0","47_yeastNew1","47_yeastNew2", '47_yeastNew3', '47_yeastNew5'],["A","B","C", "D", "E"])
+    pp = PlotPerformance(["40_vowels_equal_distrNew0","47_yeast_equal_distrNew0","20_letter_equal_distrNew0"],["Vowels", "Yeast", "Letter"])
+    pp = PlotPerformance(["40_vowels_equal_distrNew0","47_yeast_equal_distrNew0","20_letter_equal_distrNew0"],["Vowels", "Yeast", "Letter"])
+    pp = PlotPerformance(["40_VowelsNew0","47_yeastNew0","20_letterNew0", '12_FaultNew0', '41_WaveformNew0'],["Vowels", "Yeast", "Letter","Fault", "Waveform"])
     pp()
     #pp._fig()

@@ -409,7 +409,15 @@ if __name__=="__main__":
                          20)"""
     pp = PlotPerformance(["40_vowels_equal_distr0", "47_yeast_equal_distr0", "20_Letter_equal_distr0"],#["29_Pima_equal_distr1", "47_yeast_equal_distr1"], #["29_Pima1", "47_yeast1"]
                          ["SmartInitialGuess",  "AlbaMethod","BasicActiveLearning", "RandomSampling"], 
-                         2, 
+                         1, 
+                         20)
+    pp = PlotPerformance(["40_vowels_equal_distrNew0","47_yeast_equal_distrNew0","20_letter_equal_distrNew0"],
+                         ["SmartInitialGuess",  "AlbaMethod","BasicActiveLearning", "RandomSampling"], 
+                         1, 
+                         20)
+    pp = PlotPerformance(["40_VowelsNew0","47_yeastNew0","20_letterNew0", '12_FaultNew0', '41_WaveformNew0'],
+                         ["SmartInitialGuess",  "AlbaMethod","BasicActiveLearning", "RandomSampling"], 
+                         6, 
                          20)
     pp()
     #pp._fig()
